@@ -26,13 +26,19 @@ TYPES: list[str] = [
     "Mindcrawler"
 ]
 PSYCHEE_CHANCE: float = 2.0 # In percentage
-OVERLORD_CHANCE: float = 5.0 # In percentage
-PSYCHEE_LEVEL_BOOST: int = 0
-OVERLORD_LEVEL_BOOST: int = 0
+PSYCHEE_LEVEL_BOOST: int = 3
 PSYCHEE_VITALITY_BOOST: int = 4
+PSYCHEE_HURT_BOOST: int = 3
+PSYCHEE_LEVEL_CHANCE_BIAS: float = 1.0
+OVERLORD_CHANCE: float = 5.0 # In percentage
+OVERLORD_LEVEL_BOOST: int = 5
 OVERLORD_VITALITY_BOOST: int = 7
+OVERLORD_HURT_BOOST: int = 5
+OVERLORD_LEVEL_CHANCE_BIAS: float = 0.5
 MIN_VITALITY: int = 2 # Per level
 MAX_VITALITY: int = 4 # Per level
+MIN_HURT: int = 1 # Per level
+MAX_HURT: int = 3 # Per level
 
 
 class NightmareGenerator(commands.Cog):
@@ -53,23 +59,28 @@ class NightmareGenerator(commands.Cog):
         nightmares: str = ""
 
         for _i in range(amount):
-            is_psychee: bool = utils.random.percentage() <= PSYCHEE_CHANCE
-            is_overlord: bool = utils.random.percentage() <= OVERLORD_CHANCE
-
             type: str = random.choice(TYPES)
-            danger_level: str = random.choice(DANGER_LEVELS)
-            level: int = (
-                random.randint(min_level, max_level)
-                + PSYCHEE_LEVEL_BOOST*is_psychee
-                + OVERLORD_LEVEL_BOOST*is_overlord
-            )
-            vitality: int = (
-                random.randint(MIN_VITALITY, MAX_VITALITY)*level
-                + PSYCHEE_VITALITY_BOOST*is_psychee
-                + OVERLORD_VITALITY_BOOST*is_psychee
-            )
-            extra_descriptor: str = ""
+            level: int = random.randint(min_level, max_level)
+            vitality: int = random.randint(MIN_VITALITY, MAX_VITALITY)*level
+            hurt: int = random.randint(MIN_HURT, MAX_HURT)
 
+            is_psychee: bool = (
+                utils.random.percentage() + PSYCHEE_LEVEL_CHANCE_BIAS * level
+            ) <= PSYCHEE_CHANCE
+            is_overlord: bool = (
+                utils.random.percentage() + OVERLORD_LEVEL_CHANCE_BIAS * level
+            ) <= OVERLORD_CHANCE
+
+            if is_psychee:
+                level += PSYCHEE_LEVEL_BOOST
+                vitality += PSYCHEE_VITALITY_BOOST
+                hurt += PSYCHEE_HURT_BOOST
+            if is_overlord:
+                level += OVERLORD_LEVEL_BOOST
+                vitality += OVERLORD_VITALITY_BOOST
+                hurt += OVERLORD_HURT_BOOST
+
+            extra_descriptor: str = ""
             descriptors = []
             if is_psychee:
                 descriptors.append("Psychee")
@@ -82,9 +93,8 @@ class NightmareGenerator(commands.Cog):
                 extra_descriptor = ", ".join(descriptors)
 
             nightmares += (
-                "Level %d %s, %s (%s): %d/%d\n" % (
-                    level, type, danger_level, extra_descriptor,
-                    vitality, vitality
+                "Level %d %s (%s): Vitality %d, Hurt %d\n" % (
+                    level, type, extra_descriptor, vitality, hurt
                 )
             )
 
