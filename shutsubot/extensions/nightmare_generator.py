@@ -25,36 +25,55 @@ TYPES: list[str] = [
     "Mimic",
     "Mindcrawler"
 ]
-PSYCHEE_CHANCE: float = 2.0 # In percentage
-PSYCHEE_LEVEL_BOOST: int = 3
-PSYCHEE_VITALITY_BOOST: int = 4
-PSYCHEE_HURT_BOOST: int = 3
-PSYCHEE_LEVEL_CHANCE_BIAS: float = 1.0
-OVERLORD_CHANCE: float = 5.0 # In percentage
-OVERLORD_LEVEL_BOOST: int = 5
-OVERLORD_VITALITY_BOOST: int = 7
-OVERLORD_HURT_BOOST: int = 5
-OVERLORD_LEVEL_CHANCE_BIAS: float = 0.5
+PSYCHEE: dict = {
+    "CHANCE": 5.0,
+    "LEVEL_BOOST": 3,
+    "VITALITY_BOOST": 4,
+    "HURT_BOOST": 3,
+    "LEVEL_CHANCE_BIAS": 1.0
+}
+OVERLORD: dict = {
+    "CHANCE": 2.5,
+    "LEVEL_BOOST": 5,
+    "VITALITY_BOOST": 7,
+    "HURT_BOOST": 5,
+    "LEVEL_CHANCE_BIAS": 0.5
+}
 MIN_VITALITY: int = 2 # Per level
 MAX_VITALITY: int = 4 # Per level
 MIN_HURT: int = 1 # Per level
 MAX_HURT: int = 3 # Per level
+MIN_LEVEL: int = 1
+MAX_LEVEL: int = 20
 
 
 class NightmareGenerator(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
-    @commands.command()
+    @commands.command(aliases=("gen",))
     async def generate(
         self, ctx: commands.Context,
-        r_amount: str = "1",
-        r_base_level: str = "1",
-        r_ceil_level: str = "4"
+        amount: int = 1,
+        level_specifier: str = "1-4"
     ) -> None:
-        amount: int = int(r_amount)
-        min_level: int = int(r_base_level)
-        max_level: int = int(r_ceil_level)
+        min_level: int = 0
+        max_level: int = 0
+
+        if "-" in level_specifier:
+            if level_specifier[0] == "-":
+                min_level = MIN_LEVEL
+                max_level = int(level_specifier[1:])
+            elif level_specifier[-1] == "-":
+                min_level = int(level_specifier[:-1])
+                max_level = MAX_LEVEL
+            else:
+                level_args = level_specifier.split("-")
+                min_level = int(level_args[0])
+                max_level = int(level_args[1])
+        else:
+            min_level = int(level_specifier)
+            max_level = min_level
 
         nightmares: str = ""
 
@@ -65,20 +84,20 @@ class NightmareGenerator(commands.Cog):
             hurt: int = random.randint(MIN_HURT, MAX_HURT)
 
             is_psychee: bool = (
-                utils.random.percentage() + PSYCHEE_LEVEL_CHANCE_BIAS * level
-            ) <= PSYCHEE_CHANCE
+                utils.random.percentage() + PSYCHEE["LEVEL_CHANCE_BIAS"]*level
+            ) <= PSYCHEE["CHANCE"]
             is_overlord: bool = (
-                utils.random.percentage() + OVERLORD_LEVEL_CHANCE_BIAS * level
-            ) <= OVERLORD_CHANCE
+                utils.random.percentage() + OVERLORD["LEVEL_CHANCE_BIAS"]*level
+            ) <= OVERLORD["CHANCE"]
 
             if is_psychee:
-                level += PSYCHEE_LEVEL_BOOST
-                vitality += PSYCHEE_VITALITY_BOOST
-                hurt += PSYCHEE_HURT_BOOST
+                level += PSYCHEE["LEVEL_BOOST"]
+                vitality += PSYCHEE["VITALITY_BOOST"]
+                hurt += PSYCHEE["HURT_BOOST"]
             if is_overlord:
-                level += OVERLORD_LEVEL_BOOST
-                vitality += OVERLORD_VITALITY_BOOST
-                hurt += OVERLORD_HURT_BOOST
+                level += OVERLORD["LEVEL_BOOST"]
+                vitality += OVERLORD["VITALITY_BOOST"]
+                hurt += OVERLORD["HURT_BOOST"]
 
             extra_descriptor: str = ""
             descriptors = []
