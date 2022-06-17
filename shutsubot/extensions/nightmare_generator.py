@@ -55,7 +55,8 @@ class NightmareGenerator(commands.Cog):
     async def generate(
         self, ctx: commands.Context,
         amount: int = 1,
-        level_specifier: str = "1-4"
+        level_specifier: str = "1-4",
+        modifiers_specifier: str = ""
     ) -> None:
         min_level: int = 0
         max_level: int = 0
@@ -75,6 +76,10 @@ class NightmareGenerator(commands.Cog):
             min_level = int(level_specifier)
             max_level = min_level
 
+        fixed_normal: bool = "n" in modifiers_specifier
+        fixed_psychee: bool = "p" in modifiers_specifier
+        fixed_overlord: bool = "o" in modifiers_specifier
+
         nightmares: str = ""
 
         for _i in range(amount):
@@ -83,19 +88,17 @@ class NightmareGenerator(commands.Cog):
             vitality: int = random.randint(MIN_VITALITY, MAX_VITALITY)*level
             hurt: int = random.randint(MIN_HURT, MAX_HURT)
 
-            is_psychee: bool = (
+            is_psychee: bool = not fixed_normal and fixed_psychee or (
                 utils.random.percentage() + PSYCHEE["LEVEL_CHANCE_BIAS"]*level
             ) <= PSYCHEE["CHANCE"]
-            is_overlord: bool = (
+            is_overlord: bool = not fixed_normal and fixed_overlord or (
                 utils.random.percentage() + OVERLORD["LEVEL_CHANCE_BIAS"]*level
             ) <= OVERLORD["CHANCE"]
 
             if is_psychee:
-                level += PSYCHEE["LEVEL_BOOST"]
                 vitality += PSYCHEE["VITALITY_BOOST"]
                 hurt += PSYCHEE["HURT_BOOST"]
             if is_overlord:
-                level += OVERLORD["LEVEL_BOOST"]
                 vitality += OVERLORD["VITALITY_BOOST"]
                 hurt += OVERLORD["HURT_BOOST"]
 
