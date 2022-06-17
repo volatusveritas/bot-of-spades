@@ -5,7 +5,8 @@ from shutsubot import constants
 
 class Shutsubot(commands.Bot):
     def load_default_exts(self):
-        self.load_extension("shutsubot.extensions.nightmare_generator")
+        for ext in constants.DEFAULT_EXTENSIONS:
+            self.load_extension(f"shutsubot.extensions.{ext}")
 
 
 bot = Shutsubot(constants.PREFIXES)
