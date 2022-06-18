@@ -1,0 +1,1 @@
+DICE_ARROW: str = "\U0001F80A"
