@@ -6,7 +6,7 @@ from shutsubot import unicode
 
 
 class Dice(commands.Cog):
-    @commands.command()
+    @commands.command(aliases=["r"])
     async def roll(self, ctx, attr_val:int=0) -> None:
         dice_results: list[int] = []
         highest_val: int = 0
