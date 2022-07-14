@@ -2,6 +2,7 @@ from discord.ext import commands
 from voladice import D6, D20
 
 from botofspades.unicode import FIELD_ARROW
+from botofspades.log import extension_loaded, extension_unloaded
 
 
 class IntoTheOdd(commands.Cog):
@@ -29,7 +30,9 @@ class IntoTheOdd(commands.Cog):
 
 def setup(bot: commands.Bot) -> None:
     bot.add_cog(IntoTheOdd())
+    extension_loaded("Into the Odd")
 
 
 def teardown(bot: commands.Bot) -> None:
     bot.remove_cog("IntoTheOdd")
+    extension_unloaded("Into the Odd")
