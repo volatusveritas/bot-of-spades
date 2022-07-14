@@ -1,22 +1,22 @@
 from discord.ext import commands
+from voladice import D6, D20
 
 from botofspades.unicode import FIELD_ARROW
-from botofspades.dice import D6, D20, Dice
 
 
 class IntoTheOdd(commands.Cog):
     @commands.group(invoke_without_command=True, aliases=["ito"])
     async def intotheodd(self, ctx) -> None:
-        pass
+        ...
 
     @intotheodd.command(aliases=["r"])
     async def roll(self, ctx) -> None:
-        await ctx.send(f"{ctx.author.mention} {D20.roll().total}")
+        await ctx.send(f"{ctx.author.mention} {D20.roll().get_total()}")
 
     @intotheodd.command(aliases=["rollatts", "ratts", "ra"])
     async def rollattributes(self, ctx) -> None:
         strength, dexterity, willpower = [
-            (D6*3).roll().total for _ in range(3)
+            D6.rollmany(3).get_total() for _ in range(3)
         ]
 
         await ctx.send(
