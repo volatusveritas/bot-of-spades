@@ -1,7 +1,8 @@
 TOKEN: str = (
-    'OTcyMjIwNDg3ODMwNzYxNTUz.GDEtSZ.riuy2kG455BYyRrtnR4RVu94l8XNvO1pJRcDJo'
+    'OTcyMjIwNDg3ODMwNzYxNTUz.GLnuSR.pkjiqmwWuI3OKqiyh69LkCtFhc8gYX4wJ6lU2E'
 )
-PREFIXES: list[str] = ["spades.", "bos.", "&"]
-DEFAULT_EXTENSIONS: list[str] = [
-    "intotheodd"
-]
+PREFIXES: tuple[str, ...] = ("spades.", "bos.", "&")
+DEFAULT_EXTENSIONS: tuple[str, ...] = (
+    "intotheodd",
+    "charsheets",
+)
