@@ -16,15 +16,22 @@ class IntoTheOdd(commands.Cog):
 
     @intotheodd.command(aliases=["rollatts", "ratts", "ra"])
     async def rollattributes(self, ctx) -> None:
-        strength, dexterity, willpower = [
-            D6.rollmany(3).get_total() for _ in range(3)
-        ]
+        strength, dexterity, willpower = 0, 0, 0
+        roll_amount: int = 0
+
+        while max(strength, dexterity, willpower) < 10:
+            strength, dexterity, willpower = [
+                D6.rollmany(3).get_total() for _ in range(3)
+            ]
+
+            roll_amount += 1
 
         await ctx.send(
             f"{ctx.author.mention}\n"
             f"Strength {FIELD_ARROW} {strength}\n"
             f"Dexterity {FIELD_ARROW} {dexterity}\n"
-            f"Willpower {FIELD_ARROW} {willpower}"
+            f"Willpower {FIELD_ARROW} {willpower}\n"
+            + (f"\nRerolls: {roll_amount - 1}" if roll_amount > 1 else "")
         )
 
 
