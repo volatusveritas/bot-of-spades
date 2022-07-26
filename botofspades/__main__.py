@@ -21,8 +21,7 @@ setup_logging()
 # [Secrets]
 # token = <your token here>
 config: ConfigParser = ConfigParser()
-with open("config.ini", "r") as configfile:
-    config.read(configfile)
+config.read("config.ini")
 TOKEN: str = config["Secrets"]["token"]
 del config
 
