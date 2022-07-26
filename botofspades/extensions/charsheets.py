@@ -131,6 +131,7 @@ class JSONFileWrapperReadOnly:
 
         return False
 
+
 class JSONFileWrapperUpdate(JSONFileWrapperReadOnly):
     def __init__(self, path: Path) -> None:
         super().__init__(path)
@@ -161,9 +162,8 @@ def get_sheet_path(name: str) -> Path:
 
 
 def get_field_string(name: str, value: dict) -> str:
-    return (
-        f"**{name.title()}** ({value['type'].title()})"
-        + (f" [default is {value['default']}]" if value["default"] else "")
+    return f"**{name.title()}** ({value['type'].title()})" + (
+        f" [default is {value['default']}]" if value["default"] else ""
     )
 
 
@@ -176,16 +176,22 @@ class Charsheets(commands.Cog):
     async def _reply_no_subcommand(cls, ctx) -> None:
         await ctx.message.reply(
             "No valid subcommand provided. Available subcommands: "
-            + (", ".join(
-                [f"`{command.name}`" for command in ctx.command.commands]
-            ))
+            + (
+                ", ".join(
+                    [f"`{command.name}`" for command in ctx.command.commands]
+                )
+            )
             + "."
         )
 
     @classmethod
     async def _update_field(
-        cls, ctx, sheet_name: str, field_name: str,
-        sheet_path: Path, value: str
+        cls,
+        ctx,
+        sheet_name: str,
+        field_name: str,
+        sheet_path: Path,
+        value: str,
     ) -> None:
         with JSONFileWrapperUpdate(sheet_path) as sheet:
             template_path: Path = get_template_path(sheet["template"])
@@ -248,8 +254,9 @@ class Charsheets(commands.Cog):
             await ctx.message.reply("This template already exists.")
 
     @template.command(
-        name="remove", aliases=("rm",),
-        usage="charsheets template remove <name>*"
+        name="remove",
+        aliases=("rm",),
+        usage="charsheets template remove <name>*",
     )
     async def template_remove(self, ctx, *names: str) -> None:
         output_msg: str = ""
@@ -265,8 +272,9 @@ class Charsheets(commands.Cog):
         await ctx.message.reply(output_msg)
 
     @template.command(
-        name="rename", aliases=("rn",),
-        usage="charsheets template rename <old name> <new name>"
+        name="rename",
+        aliases=("rn",),
+        usage="charsheets template rename <old name> <new name>",
     )
     async def template_rename(self, ctx, old_name: str, new_name: str) -> None:
         old_name = old_name.lower()
@@ -295,13 +303,14 @@ class Charsheets(commands.Cog):
     )
     async def template_list(self, ctx) -> None:
         template_names: list[str] = [
-            template_path.stem.title() for template_path in
-            templates_dir.glob(f"*.{TEMPLATE_EXTENSION}")
+            template_path.stem.title()
+            for template_path in templates_dir.glob(f"*.{TEMPLATE_EXTENSION}")
         ]
 
         await ctx.message.reply(
             ("Available templates:\n- " + "\n- ".join(template_names))
-            if template_names else "No templates available."
+            if template_names
+            else "No templates available."
         )
 
     @template.group(name="field", invoke_without_command=True, aliases=("fd",))
@@ -313,11 +322,15 @@ class Charsheets(commands.Cog):
         usage=(
             "charsheets template field add"
             " <template> <field> <type> [default value]"
-        )
+        ),
     )
     async def template_field_add(
-        self, ctx, template_name: str, field_name: str,
-        type: str, default: str = ""
+        self,
+        ctx,
+        template_name: str,
+        field_name: str,
+        type: str,
+        default: str = "",
     ) -> None:
         template_name = template_name.lower()
         field_name = field_name.lower()
@@ -353,18 +366,19 @@ class Charsheets(commands.Cog):
 
             template["fields"][field_name] = {
                 "type": type,
-                "default": default_value
+                "default": default_value,
             }
 
             await ctx.message.reply(
                 "Field "
-                + get_field_string(field_name, template['fields'][field_name])
+                + get_field_string(field_name, template["fields"][field_name])
                 + f" successfully added to template `{template_name}`."
             )
 
     @template_field.command(
-        name="remove", aliases=("rm",),
-        usage="charsheets template field remove <field>*"
+        name="remove",
+        aliases=("rm",),
+        usage="charsheets template field remove <field>*",
     )
     async def template_field_remove(
         self, ctx, template_name: str, *field_names: str
@@ -394,8 +408,9 @@ class Charsheets(commands.Cog):
         await ctx.message.reply(output_msg)
 
     @template_field.command(
-        name="rename", aliases=("rn",),
-        usage="charsheets template field rename <old name> <new name>"
+        name="rename",
+        aliases=("rn",),
+        usage="charsheets template field rename <old name> <new name>",
     )
     async def template_field_rename(
         self, ctx, template_name: str, old_name: str, new_name: str
@@ -429,8 +444,9 @@ class Charsheets(commands.Cog):
             )
 
     @template_field.command(
-        name="list", aliases=("ls",),
-        usage="charsheets template field list [type]"
+        name="list",
+        aliases=("ls",),
+        usage="charsheets template field list [type]",
     )
     async def template_field_list(
         self, ctx, template_name: str, type: str = "any"
@@ -460,19 +476,25 @@ class Charsheets(commands.Cog):
 
         await ctx.message.reply(
             f"Fields in `{template_name}`:\n{output_msg}"
-            if output_msg else "No fields found."
+            if output_msg
+            else "No fields found."
         )
 
     @template_field.command(
-        name="edit", aliases=("ed",),
+        name="edit",
+        aliases=("ed",),
         usage=(
             "charsheets template field edit"
             " <template> <field> <new type> [new default]"
-        )
+        ),
     )
     async def template_field_edit(
-        self, ctx, template_name: str, field_name: str,
-        type: str, default: str = ""
+        self,
+        ctx,
+        template_name: str,
+        field_name: str,
+        type: str,
+        default: str = "",
     ) -> None:
         template_name = template_name.lower()
         field_name = field_name.lower()
@@ -508,14 +530,13 @@ class Charsheets(commands.Cog):
 
             template["fields"][field_name] = {
                 "type": type,
-                "default": default_value
+                "default": default_value,
             }
 
             await ctx.message.reply(
                 f"Field updated to "
-                + get_field_string(field_name, template['fields'][field_name])
+                + get_field_string(field_name, template["fields"][field_name])
             )
-
 
     @charsheets.group(invoke_without_command=True, aliases=("sh",))
     async def sheet(self, ctx) -> None:
@@ -540,7 +561,7 @@ class Charsheets(commands.Cog):
             sheet_path.touch()
             with (
                 JSONFileWrapperReadOnly(template_path) as template,
-                JSONFileWrapperUpdate(sheet_path) as sheet
+                JSONFileWrapperUpdate(sheet_path) as sheet,
             ):
                 sheet["template"] = template_name
                 sheet["fields"] = {
@@ -601,13 +622,14 @@ class Charsheets(commands.Cog):
         for sheet_path in charsheets_dir.glob(f"*.{CHARSHEET_EXTENSION}"):
             with JSONFileWrapperReadOnly(sheet_path) as sheet:
                 if not template or sheet["template"] == template:
-                    sheet_list.append(get_sheet_string(
-                        sheet_path.stem, sheet["template"]
-                    ))
+                    sheet_list.append(
+                        get_sheet_string(sheet_path.stem, sheet["template"])
+                    )
 
         await ctx.message.reply(
             ("Available sheets:\n- " + "\n- ".join(sheet_list))
-            if sheet_list else "No sheets found."
+            if sheet_list
+            else "No sheets found."
         )
 
     @sheet.command(name="totext", aliases=("txt",))
