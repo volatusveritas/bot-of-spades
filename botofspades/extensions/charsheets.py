@@ -542,7 +542,7 @@ class Charsheets(commands.Cog):
     async def sheet(self, ctx) -> None:
         await self._reply_no_subcommand(ctx)
 
-    @sheet.command(name="add")
+    @sheet.command(name="add", usage="charsheets sheet add <template> <name>")
     async def sheet_add(
         self, ctx, template_name: str, sheet_name: str
     ) -> None:
@@ -576,7 +576,9 @@ class Charsheets(commands.Cog):
         except FileExistsError:
             await ctx.message.reply(f"Sheet `{sheet_name}` already exists.")
 
-    @sheet.command(name="remove", aliases=("rm",))
+    @sheet.command(
+        name="remove", aliases=("rm",), usage="charsheets sheet remove <name>*"
+    )
     async def sheet_remove(self, ctx, *names: str) -> None:
         output_msg: str = ""
         for name in [name.lower() for name in names]:
@@ -590,7 +592,11 @@ class Charsheets(commands.Cog):
 
         await ctx.message.reply(output_msg)
 
-    @sheet.command(name="rename", aliases=("rn",))
+    @sheet.command(
+        name="rename",
+        aliases=("rn",),
+        usage="charsheets sheet rename <old name> <new name>",
+    )
     async def sheet_rename(self, ctx, old_name: str, new_name: str) -> None:
         old_name = old_name.lower()
         new_name = new_name.lower()
@@ -612,7 +618,9 @@ class Charsheets(commands.Cog):
             f"Sheet `{old_name}` successfully renamed to `{new_name}`."
         )
 
-    @sheet.command(name="list", aliases=("ls",))
+    @sheet.command(
+        name="list", aliases=("ls",), usage="charsheets sheet list [template]"
+    )
     async def sheet_list(self, ctx, template: str = "") -> None:
         if template and not get_template_path(template).exists():
             await ctx.message.reply(f"Template `{template}` not found.")
@@ -632,7 +640,9 @@ class Charsheets(commands.Cog):
             else "No sheets found."
         )
 
-    @sheet.command(name="totext", aliases=("txt",))
+    @sheet.command(
+        name="totext", aliases=("txt",), usage="charsheets sheet totext <name>"
+    )
     async def sheet_totext(self, ctx, name: str) -> None:
         name = name.lower()
 
@@ -664,7 +674,11 @@ class Charsheets(commands.Cog):
 
         await ctx.message.reply(output_msg)
 
-    @sheet.command(name="field", aliases=("fd",))
+    @sheet.command(
+        name="field",
+        aliases=("fd",),
+        usage="charsheets sheet field <sheet> <field> [new value]",
+    )
     async def sheet_field(
         self, ctx, sheet_name: str, field_name: str, value: str = ""
     ) -> None:
