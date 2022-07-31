@@ -160,7 +160,7 @@ cython_debug/
 #.idea/
 
 # Charsheets folder
-charsheets/
+/charsheets/
 
 # Secret configs
-config.ini
+/config.ini
