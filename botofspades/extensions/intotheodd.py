@@ -5,6 +5,9 @@ from botofspades.unicode import FIELD_ARROW
 from botofspades.log import extension_loaded, extension_unloaded
 
 
+EXTENSION_NAME: str = "Into the Odd"
+
+
 class IntoTheOdd(commands.Cog):
     @commands.group(invoke_without_command=True, aliases=["ito"])
     async def intotheodd(self, ctx) -> None:
@@ -37,9 +40,9 @@ class IntoTheOdd(commands.Cog):
 
 def setup(bot: commands.Bot) -> None:
     bot.add_cog(IntoTheOdd())
-    extension_loaded("Into the Odd")
+    extension_loaded(EXTENSION_NAME)
 
 
 def teardown(bot: commands.Bot) -> None:
     bot.remove_cog("IntoTheOdd")
-    extension_unloaded("Into the Odd")
+    extension_unloaded(EXTENSION_NAME)

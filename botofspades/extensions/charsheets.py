@@ -9,8 +9,12 @@ from discord.ext import commands
 from botofspades.log import extension_loaded, extension_unloaded
 
 
+EXTENSION_NAME: str = "Charsheets"
 TEMPLATE_EXTENSION: str = "cstemplate"
 CHARSHEET_EXTENSION: str = "cscharsheet"
+SUCCESS_EMOJI: str = ":star2:"
+INFO_EMOJI: str = ":notepad_spiral:"
+ERROR_EMOJI: str = ":loudspeaker:"
 
 base_dir: Path = Path.cwd() / "charsheets"
 templates_dir: Path = base_dir / "templates"
@@ -172,14 +176,14 @@ class JSONFileWrapperUpdate(JSONFileWrapperReadOnly):
         return self._dict
 
 
-class ErrorMessage:
+class OutputMessage:
     @staticmethod
     def not_found(what: str, detail: str) -> str:
-        return f"{what.title()} `{detail}` not found."
+        return f"{ERROR_EMOJI} {what.title()} **{detail}** not found."
 
     @staticmethod
     def none_found(what: str) -> str:
-        return f"No {what} found."
+        return f"{ERROR_EMOJI} No {what} found."
 
 
 def get_template_path(name: str) -> Path:
@@ -197,14 +201,15 @@ def get_field_string(name: str, value: dict) -> str:
 
 
 def get_sheet_string(name: str, template: str) -> str:
-    return f"**{name.title()}** (from `{template}`)"
+    return f"**{name.title()}** (from **{template.title()}**)"
 
 
 class Charsheets(commands.Cog):
     @classmethod
     async def _reply_no_subcommand(cls, ctx) -> None:
         await ctx.message.reply(
-            "No valid subcommand provided. Available subcommands: "
+            f"{ERROR_EMOJI} "
+            + "No valid subcommand provided. Available subcommands: "
             + (
                 ", ".join(
                     [f"`{command.name}`" for command in ctx.command.commands]
@@ -227,7 +232,7 @@ class Charsheets(commands.Cog):
 
             if not template_path.exists():
                 await ctx.message.reply(
-                    ErrorMessage.not_found("template", sheet["template"])
+                    OutputMessage.not_found("template", sheet["template"])
                 )
                 return
 
@@ -239,12 +244,14 @@ class Charsheets(commands.Cog):
                     sheet["fields"][field_name] = new_value
 
                     await ctx.message.reply(
+                        f"{SUCCESS_EMOJI} "
                         f"Value of {sheet_name.title()}:"
                         f" {field_name.title()} set to"
                         f" {sheet['fields'][field_name]}."
                     )
                 except Exception as e:
                     await ctx.message.reply(
+                        f"{ERROR_EMOJI} "
                         f"Invalid value `{value}` for type {type.title()}."
                     )
 
@@ -254,7 +261,8 @@ class Charsheets(commands.Cog):
     ) -> None:
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.message.reply(
-                f"Missing argument `{error.param}`.\n"
+                f"{ERROR_EMOJI} "
+                f"Missing argument `{error.param}`\n"
                 f"Usage: `{ctx.command.usage}`."
             )
 
@@ -278,9 +286,13 @@ class Charsheets(commands.Cog):
             with JSONFileWrapperUpdate(template_path) as template:
                 template["fields"] = {}
 
-            await ctx.message.reply(f"Template `{name}` successfully created.")
+            await ctx.message.reply(
+                f"{SUCCESS_EMOJI} Template **{name}** successfully created."
+            )
         except FileExistsError:
-            await ctx.message.reply("This template already exists.")
+            await ctx.message.reply(
+                f"{ERROR_EMOJI} This template already exists."
+            )
 
     @template.command(
         name="remove",
@@ -295,9 +307,12 @@ class Charsheets(commands.Cog):
 
             try:
                 template_path.unlink()
-                output_msg += f"Template `{name}` successfully removed.\n"
+                output_msg += (
+                    f"{SUCCESS_EMOJI} "
+                    f"Template **{name}** successfully removed.\n"
+                )
             except FileNotFoundError:
-                output_msg += ErrorMessage.not_found("template", name) + "\n"
+                output_msg += OutputMessage.not_found("template", name) + "\n"
 
         sheets_changed: int = 0
         for path in charsheets_dir.glob(f"*.{CHARSHEET_EXTENSION}"):
@@ -310,7 +325,7 @@ class Charsheets(commands.Cog):
                 path.unlink()
                 sheets_changed += 1
 
-        output_msg += f"{sheets_changed} sheets removed."
+        output_msg += f"{INFO_EMOJI} {sheets_changed} sheets removed."
 
         await ctx.message.reply(output_msg)
 
@@ -328,13 +343,14 @@ class Charsheets(commands.Cog):
 
         if not template_path.exists():
             await ctx.message.reply(
-                ErrorMessage.not_found("template", old_name)
+                OutputMessage.not_found("template", old_name)
             )
             return
 
         if target_path.exists():
             await ctx.message.reply(
-                f"A template with the name `{new_name}` already exists."
+                f"{ERROR_EMOJI} "
+                f"A template with the name **{new_name}** already exists."
             )
             return
 
@@ -348,7 +364,9 @@ class Charsheets(commands.Cog):
                     sheets_changed += 1
 
         await ctx.message.reply(
-            f"Template `{old_name}` successfully renamed to `{new_name}`.\n"
+            f"{SUCCESS_EMOJI} "
+            f"Template **{old_name}** successfully renamed to"
+            f" **{new_name}**.\n"
             f"{sheets_changed} sheets updated."
         )
 
@@ -362,9 +380,11 @@ class Charsheets(commands.Cog):
         ]
 
         await ctx.message.reply(
-            ("Available templates:\n- " + "\n- ".join(template_names))
-            if template_names
-            else "No templates available."
+            (
+                f"{INFO_EMOJI} "
+                "Available templates:\n- " + "\n- ".join(template_names)
+            ) if template_names
+            else f"{ERROR_EMOJI} No templates available."
         )
 
     @template.group(name="field", invoke_without_command=True, aliases=("fd",))
@@ -391,14 +411,14 @@ class Charsheets(commands.Cog):
         type = type.lower()
 
         if type not in FIELD_TYPES:
-            await ctx.message.reply(f"Invalid type `{type}`.")
+            await ctx.message.reply(f"{ERROR_EMOJI} Invalid type **{type}**.")
             return
 
         template_path: Path = get_template_path(template_name)
 
         if not template_path.exists():
             await ctx.message.reply(
-                ErrorMessage.not_found("template", template_name)
+                OutputMessage.not_found("template", template_name)
             )
             return
 
@@ -408,7 +428,8 @@ class Charsheets(commands.Cog):
                 default_value = FIELD_TYPES[type](default).to_python_obj()
             except Exception as e:
                 await ctx.message.reply(
-                    f"Invalid default value `{default}` for type `{type}`."
+                    f"{ERROR_EMOJI} "
+                    f"Invalid default value **{default}** for type **{type}**."
                 )
                 print(e)
                 return
@@ -417,7 +438,7 @@ class Charsheets(commands.Cog):
         with JSONFileWrapperUpdate(template_path) as template:
             if field_name in template["fields"]:
                 await ctx.message.reply(
-                    f"Field `{field_name}` already exists."
+                    f"{ERROR_EMOJI} Field **{field_name}** already exists."
                 )
                 return
 
@@ -427,9 +448,9 @@ class Charsheets(commands.Cog):
             }
 
             output_msg += (
-                "Field "
+                f"{SUCCESS_EMOJI} Field "
                 + get_field_string(field_name, template["fields"][field_name])
-                + f" successfully added to template `{template_name}`.\n"
+                + f" successfully added to template **{template_name}**.\n"
             )
 
         sheets_changed: int = 0
@@ -439,7 +460,7 @@ class Charsheets(commands.Cog):
                     sheet["fields"][field_name] = default_value
                     sheets_changed += 1
 
-        output_msg += f"{sheets_changed} sheets updated."
+        output_msg += f"{INFO_EMOJI} {sheets_changed} sheets updated."
 
         await ctx.message.reply(output_msg)
 
@@ -457,7 +478,7 @@ class Charsheets(commands.Cog):
 
         if not template_path.exists():
             await ctx.message.reply(
-                ErrorMessage.not_found("template", template_name)
+                OutputMessage.not_found("template", template_name)
             )
             return
 
@@ -468,14 +489,14 @@ class Charsheets(commands.Cog):
             for field_name in field_list.copy():
                 if field_name not in template["fields"]:
                     output_msg += (
-                        ErrorMessage.not_found("field", field_name) + "\n"
+                        OutputMessage.not_found("field", field_name) + "\n"
                     )
                     field_list.remove(field_name)
 
                     continue
 
                 output_msg += (
-                    f"Field `{field_name}`"
+                    f"{SUCCESS_EMOJI} Field **{field_name}**"
                     f" ({template['fields'][field_name]['type']}) removed.\n"
                 )
                 del template["fields"][field_name]
@@ -489,7 +510,7 @@ class Charsheets(commands.Cog):
 
                     sheets_changed += 1
 
-        output_msg += f"{sheets_changed} sheets updated."
+        output_msg += f"{INFO_EMOJI} {sheets_changed} sheets updated."
 
         await ctx.message.reply(output_msg)
 
@@ -509,7 +530,7 @@ class Charsheets(commands.Cog):
 
         if not template_path.exists():
             await ctx.message.reply(
-                ErrorMessage.not_found("template", template_name)
+                OutputMessage.not_found("template", template_name)
             )
             return
 
@@ -517,12 +538,14 @@ class Charsheets(commands.Cog):
         with JSONFileWrapperUpdate(template_path) as template:
             if not old_name in template["fields"]:
                 await ctx.message.reply(
-                    ErrorMessage.not_found("field", old_name)
+                    OutputMessage.not_found("field", old_name)
                 )
                 return
 
             if new_name in template["fields"]:
-                await ctx.message.reply(f"Field `{new_name}` already exists.")
+                await ctx.message.reply(
+                    f"{ERROR_EMOJI} Field **{new_name}** already exists."
+                )
                 return
 
             field: dict = template["fields"][old_name]
@@ -530,8 +553,8 @@ class Charsheets(commands.Cog):
             template[new_name] = field
 
             output_msg += (
-                f"Field `{old_name} ({field['type']})`"
-                f" renamed to `{new_name}`.\n"
+                f"{SUCCESS_EMOJI} Field {get_field_string(old_name, field)}"
+                f" successfully renamed to **{new_name}**.\n"
             )
 
         sheets_changed: int = 0
@@ -544,7 +567,7 @@ class Charsheets(commands.Cog):
 
                     sheets_changed += 1
 
-        output_msg += f"{sheets_changed} sheets updated."
+        output_msg += f"{INFO_EMOJI} {sheets_changed} sheets updated."
 
         await ctx.message.reply(output_msg)
 
@@ -560,18 +583,18 @@ class Charsheets(commands.Cog):
         type = type.lower()
 
         if type != "any" and type not in FIELD_TYPES:
-            await ctx.message.reply(f"Invalid type `{type}`.")
+            await ctx.message.reply(f"Invalid type **{type}**.")
             return
 
         template_path: Path = get_template_path(template_name)
 
         if not template_path.exists():
             await ctx.message.reply(
-                ErrorMessage.not_found("template", template_name)
+                OutputMessage.not_found("template", template_name)
             )
             return
 
-        output_msg: str = ""
+        listed_fields: str = ""
         with template_path.open("r") as template_file:
             template = load(template_file)
 
@@ -579,12 +602,12 @@ class Charsheets(commands.Cog):
                 if type != "any" and value["type"] != type:
                     continue
 
-                output_msg += f"- {get_field_string(name, value)}\n"
+                listed_fields += f"- {get_field_string(name, value)}\n"
 
         await ctx.message.reply(
-            f"Fields in `{template_name}`:\n{output_msg}"
-            if output_msg
-            else ErrorMessage.none_found("fields")
+            f"{INFO_EMOJI} Fields in **{template_name}**:\n{listed_fields}"
+            if listed_fields
+            else OutputMessage.none_found("fields")
         )
 
     @template_field.command(
@@ -608,14 +631,14 @@ class Charsheets(commands.Cog):
         type = type.lower()
 
         if type not in FIELD_TYPES:
-            await ctx.message.reply(f"Invalid type `{type}`.")
+            await ctx.message.reply(f"{ERROR_EMOJI} Invalid type **{type}**.")
             return
 
         template_path: Path = get_template_path(template_name)
 
         if not template_path.exists():
             await ctx.message.reply(
-                ErrorMessage.not_found("template", template_name)
+                OutputMessage.not_found("template", template_name)
             )
             return
 
@@ -625,7 +648,8 @@ class Charsheets(commands.Cog):
                 default_value = FIELD_TYPES[type](default).to_python_obj()
             except Exception as e:
                 await ctx.message.reply(
-                    f"Invalid default value `{default}` for type `{type}`."
+                    f"{ERROR_EMOJI} "
+                    f"Invalid default value **{default}** for type **{type}**."
                 )
                 print(e)
                 return
@@ -634,7 +658,7 @@ class Charsheets(commands.Cog):
         with JSONFileWrapperUpdate(template_path) as template:
             if field_name not in template["fields"]:
                 await ctx.message.reply(
-                    ErrorMessage.not_found("field", field_name)
+                    OutputMessage.not_found("field", field_name)
                 )
                 return
 
@@ -646,7 +670,7 @@ class Charsheets(commands.Cog):
             output_msg += (
                 f"Field updated to "
                 + get_field_string(field_name, template["fields"][field_name])
-                + "\n"
+                + ".\n"
             )
 
         sheets_changed: int = 0
@@ -656,7 +680,7 @@ class Charsheets(commands.Cog):
                     sheet["fields"][field_name] = default_value
                     sheets_changed += 1
 
-        output_msg += f"{sheets_changed} sheets updated."
+        output_msg += f"{INFO_EMOJI} {sheets_changed} sheets updated."
 
         await ctx.message.reply(output_msg)
 
@@ -675,7 +699,7 @@ class Charsheets(commands.Cog):
 
         if not template_path.exists():
             await ctx.message.reply(
-                ErrorMessage.not_found("template", template_name)
+                OutputMessage.not_found("template", template_name)
             )
             return
 
@@ -694,11 +718,14 @@ class Charsheets(commands.Cog):
                 }
 
             await ctx.message.reply(
-                f"Sheet `{sheet_name}` (from template `{template_name}`)"
+                f"{SUCCESS_EMOJI} "
+                f"Sheet **{sheet_name}** (from template **{template_name}**)"
                 " sucessfully created."
             )
         except FileExistsError:
-            await ctx.message.reply(f"Sheet `{sheet_name}` already exists.")
+            await ctx.message.reply(
+                f"{ERROR_EMOJI} Sheet **{sheet_name}** already exists."
+            )
 
     @sheet.command(
         name="remove", aliases=("rm",), usage="charsheets sheet remove <name>*"
@@ -710,9 +737,11 @@ class Charsheets(commands.Cog):
 
             try:
                 sheet_path.unlink()
-                output_msg += f"Sheet `{name}` succesfully removed.\n"
+                output_msg += (
+                    f"{SUCCESS_EMOJI} Sheet **{name}** succesfully removed.\n"
+                )
             except FileNotFoundError:
-                output_msg += f"Sheet `{name}` not found.\n"
+                output_msg += f"{ERROR_EMOJI} Sheet **{name}** not found.\n"
 
         await ctx.message.reply(output_msg)
 
@@ -728,18 +757,22 @@ class Charsheets(commands.Cog):
         old_path: Path = get_sheet_path(old_name)
 
         if not old_path.exists():
-            await ctx.message.reply(ErrorMessage.not_found("sheet", old_name))
+            await ctx.message.reply(OutputMessage.not_found("sheet", old_name))
             return
 
         new_path: Path = get_sheet_path(new_name)
 
         if new_path.exists():
-            await ctx.message.reply(f"Sheet `{new_name}` already exists.")
+            await ctx.message.reply(
+                f"{ERROR_EMOJI} Sheet **{new_name}** already exists."
+            )
             return
 
         old_path.rename(new_path)
         await ctx.message.reply(
-            f"Sheet `{old_name}` successfully renamed to `{new_name}`."
+            f"{SUCCESS_EMOJI} "
+            f"Sheet **{old_name.title()}** successfully renamed to"
+            f" **{new_name.title()}**."
         )
 
     @sheet.command(
@@ -748,7 +781,7 @@ class Charsheets(commands.Cog):
     async def sheet_list(self, ctx, template: str = "") -> None:
         if template and not get_template_path(template).exists():
             await ctx.message.reply(
-                ErrorMessage.not_found("template", template)
+                OutputMessage.not_found("template", template)
             )
             return
 
@@ -761,9 +794,9 @@ class Charsheets(commands.Cog):
                     )
 
         await ctx.message.reply(
-            ("Available sheets:\n- " + "\n- ".join(sheet_list))
+            (f"{INFO_EMOJI} Available sheets:\n- " + "\n- ".join(sheet_list))
             if sheet_list
-            else ErrorMessage.none_found("sheets")
+            else OutputMessage.none_found("sheets")
         )
 
     @sheet.command(
@@ -775,7 +808,7 @@ class Charsheets(commands.Cog):
         sheet_path: Path = get_sheet_path(name)
 
         if not sheet_path.exists():
-            await ctx.message.reply(ErrorMessage.not_found("sheet", name))
+            await ctx.message.reply(OutputMessage.not_found("sheet", name))
             return
 
         output_msg: str = f"```\n{name.upper()}\n"
@@ -784,7 +817,7 @@ class Charsheets(commands.Cog):
 
             if not template_path.exists():
                 await ctx.message.send(
-                    ErrorMessage.not_found("template", sheet["template"])
+                    OutputMessage.not_found("template", sheet["template"])
                 )
                 return
 
@@ -815,7 +848,7 @@ class Charsheets(commands.Cog):
 
         if not sheet_path.exists():
             await ctx.message.reply(
-                ErrorMessage.not_found("sheet", sheet_name)
+                OutputMessage.not_found("sheet", sheet_name)
             )
             return
 
@@ -827,24 +860,25 @@ class Charsheets(commands.Cog):
             with JSONFileWrapperReadOnly(sheet_path) as sheet:
                 if field_name not in sheet["fields"]:
                     await ctx.message.reply(
-                        ErrorMessage.not_found("field", field_name)
+                        OutputMessage.not_found("field", field_name)
                     )
                     return
 
                 await ctx.message.reply(
+                    f"{INFO_EMOJI} "
                     f"{sheet_name.title()}: {field_name.title()} ="
-                    f" {sheet['fields'][field_name]}"
+                    f" {sheet['fields'][field_name]}."
                 )
 
 
 def setup(bot: commands.Bot) -> None:
     bot.add_cog(Charsheets())
-    extension_loaded("Charsheets")
+    extension_loaded(EXTENSION_NAME)
 
 
 def teardown(bot: commands.Bot) -> None:
     bot.remove_cog("Charsheets")
-    extension_unloaded("Charsheets")
+    extension_unloaded(EXTENSION_NAME)
 
 
 # Ensure directory strucutre
