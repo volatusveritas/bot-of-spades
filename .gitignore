@@ -162,5 +162,5 @@ cython_debug/
 # Charsheets folder
 /charsheets/
 
-# Secret configs
-/config.ini
+# Bot's token
+/.BOT_TOKEN

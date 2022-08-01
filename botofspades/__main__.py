@@ -1,5 +1,3 @@
-from configparser import ConfigParser
-
 from discord.ext import commands
 
 from botofspades import constants
@@ -17,13 +15,9 @@ class BotOfSpades(commands.Bot):
 
 setup_logging()
 
-# Read token from a local config file (config.ini) written in the format:
-# [Secrets]
-# token = <your token here>
-config: ConfigParser = ConfigParser()
-config.read("config.ini")
-TOKEN: str = config["Secrets"]["token"]
-del config
+# Read the bot's token from .BOT_TOKEN
+with open(".BOT_TOKEN", "r") as token_file:
+    TOKEN: str = token_file.read()
 
 bot: BotOfSpades = BotOfSpades(constants.PREFIXES)
 bot.load_default_exts()
