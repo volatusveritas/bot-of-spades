@@ -2,6 +2,7 @@ from discord.ext import commands
 
 from botofspades import constants
 from botofspades.log import logger, setup_logging
+from botofspades.outmsg import update_defbank
 
 
 class BotOfSpades(commands.Bot):
@@ -13,6 +14,7 @@ class BotOfSpades(commands.Bot):
         logger.info("Bot ready to receive commands")
 
 
+update_defbank()
 setup_logging()
 
 # Read the bot's token from .BOT_TOKEN

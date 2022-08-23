@@ -2,6 +2,7 @@ from discord.ext import commands
 
 from botofspades import constants
 from botofspades.log import extension_loaded, extension_unloaded
+from botofspades.outmsg import botsend
 
 
 EXTENSION_NAME: str = "Bot Control"
@@ -16,7 +17,7 @@ class BotControl(commands.Cog):
         for ext in constants.DEFAULT_EXTENSIONS:
             self.bot.reload_extension(f"botofspades.extensions.{ext}")
 
-        await ctx.message.reply("Extensions reloaded.")
+        await botsend(ctx, "Extensions reloaded.")
 
 
 def setup(bot: commands.Bot) -> None:

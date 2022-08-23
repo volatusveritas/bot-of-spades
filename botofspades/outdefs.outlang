@@ -1,0 +1,107 @@
+EXTENSION_LOADED
+    Extension loaded: {name}.
+
+EXTENSION_UNLOADED
+    Extension unloaded: {name}.
+
+EXTENSION_RELOADED
+    Extension reloaded: {name}.
+
+NO_SUBCOMMAND
+    {Emoji.ERROR}
+    No valid subcommand provided. Available subcommands: {subcommands}.
+
+TEMPLATE_NOT_FOUND
+    {Emoji.ERROR} Template **{name}** not found.
+
+TEMPLATE_CREATED
+    {Emoji.SUCCESS} Template **{name}** successfully created.
+
+TEMPLATE_REMOVED
+    {Emoji.SUCCESS} Template **{name}** successfully removed.
+
+TEMPLATE_RENAMED
+    {Emoji.SUCCESS} Template **{old}** successfully renamed to **{new}**.
+
+TEMPLATE_ALREADY_EXISTS
+    {Emoji.ERROR} Template **{name}** already exists.
+
+SHEET_CREATED
+    {Emoji.SUCCESS} Sheet **{name}** successfully created.
+
+SHEET_REMOVED
+    {Emoji.SUCCESS} Sheet **{name}** successfully removed.
+
+SHEET_RENAMED
+    {Emoji.SUCCESS} Sheet **{old}** successfully renamed to **{new}**.
+
+SHEET_NOT_FOUND
+    {Emoji.ERROR} Sheet **{name}** not found.
+
+SHEET_ALREADY_EXISTS
+    {Emoji.ERROR} Sheet **{name}** already exists.
+
+SHEETS_REMOVED
+    {Emoji.INFO} Sheets removed: {amount}.
+
+SHEETS_UPDATED
+    {Emoji.INFO} Sheets updated: {amount}.
+
+FIELD_VALUE_SET
+    {Emoji.SUCCESS} Value of **{field}** set to {value}.
+
+FIELD_ALREADY_EXISTS
+    {Emoji.ERROR} Field **{name}** already exists.
+
+FIELD_ADDED
+    {Emoji.SUCCESS}
+    Field **{field}** successfully added to template **{template}**.
+
+FIELD_REMOVED
+    {Emoji.SUCCESS}
+    Field **{field}** successfully removed from template **{template}**.
+
+FIELD_RENAMED
+    {Emoji.SUCCESS} Field **{field}** successfully renamed to **{new}**.
+
+FIELD_UPDATED
+    {Emoji.SUCCESS} Field **{field}** successfully updated to **{new}**.
+
+FIELD_NOT_FOUND
+    {Emoji.ERROR} Field **{name}** not found.
+
+FIELD_LIST
+    {Emoji.INFO} Fields in **{template}**:{fields}
+
+NO_FIELDS
+    {Emoji.INFO} No fields found in template **{template}**.
+
+INVALID_DEFAULT_FIELD_VALUE
+    {Emoji.ERROR} Invalid default value '{value}' for type {type}.
+
+INVALID_FIELD_VALUE
+    {Emoji.ERROR} Invalid value '{value}' for type {type}.
+
+INVALID_FIELD_TYPE
+    {Emoji.ERROR} Invalid type **{type}**.
+
+MISSING_ARGUMENT
+    {Emoji.ERROR} Missing argument `{param}`. Usage: `{usage}`.
+
+AVAILABLE_TEMPLATES
+    {Emoji.INFO} Available templates:{separator}{templates}{finaldot}
+
+AVAILABLE_SHEETS
+    {Emoji.INFO} Available sheets:{separator}{templates}{finaldot}
+
+NO_TEMPLATES_AVAILABLE
+    {Emoji.ERROR} No templates available.
+
+NO_SHEETS_AVAILABLE
+    {Emoji.ERROR} No sheets available.
+
+INVALID_FIELD_TEMPLATE
+    {Emoji.ERROR} Invalid template **{template}** for field **{field}**.
+
+FIELD_VALUE
+    {Emoji.INFO} Field value: **{field_str}**.
