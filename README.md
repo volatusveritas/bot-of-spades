@@ -90,23 +90,6 @@ character sheets and character sheet templates.
 - `charsheets sheet totext <name>`: provides a formatted textual version of
   sheet **name**.
 
-## Command Idiom
-
-Command usage is documented using the command idiom specified below.
-
-- `word`: indicates one is to literally type **word**.
-- `<parameter>`: indicates one is to provide an argument for parameter
-  **parameter**.
-- `[optional]`: indicates that providing an argument for parameter **optional**
-  is optional.
-- `<parameter>*` or `[optional]*`: indicates that multiple arguments can be
-  provided for parameter **parameter** or optionally for parameter
-  **optional**.
-
-Note: all parameters are case insensitive, with the exception of those that
-expect specific strings. Therefore, creating a template "bogus" and creating a
-template "Bogus" are effectively the same.
-
 ## Examples
 
 ### Creating a template
@@ -141,3 +124,76 @@ Provides a formatted textual version of sheet `Carlsen`.
 ```
 charsheets sheet totext Carlsen
 ```
+
+## Command Idiom
+
+Command usage is documented using the command idiom specified below.
+
+- `word`: indicates one is to literally type **word**.
+- `<parameter>`: indicates one is to provide an argument for parameter
+  **parameter**.
+- `[optional]`: indicates that providing an argument for parameter **optional**
+  is optional.
+- `<parameter>*` or `[optional]*`: indicates that multiple arguments can be
+  provided for parameter **parameter** or optionally for parameter
+  **optional**.
+
+Note: all parameters are case insensitive, with the exception of those that
+expect specific strings. Therefore, creating a template "bogus" and creating a
+template "Bogus" are effectively the same.
+
+## JSON Specifications
+
+Both templates and sheets (from the [charsheets](#charsheets) module) are saved
+as JSON files. This section specifies these files' structures.
+
+### Template Structure
+
+```json
+{
+    "fields": {
+        "name*": {
+            "type": "type_name",
+            "default": null
+        }
+    }
+}
+```
+
+#### Explanation
+
+A template starts with the root object `{}`; contains:
+
+- `fields`: an object; stores the template's fields; contains:
+    - `name*`: an object; the key is the field's name; contains:
+        - `type`: a string; specifies the field's type, tipically entirely
+          lowercase;
+        - `default`: any type (including `null`); specifies the field's
+          default value;
+
+Note: `name*` indicates there can be any amount of this object inside the
+containing object (including zero).
+
+### Sheet Structure
+
+```json
+{
+    "template": "template_name",
+    "fields": {
+        "name*": "value"
+    }
+}
+```
+
+#### Explanation
+
+A sheet starts with the root object `{}`; contains:
+
+- `template`: a string; specifies the template from which this sheet comes
+  from;
+- `fields`: an object; stores the sheet's fields; contains:
+    - `name*`: any type (including `null`); the key is the field's name;
+      specifies the field's value (starts at the template's `default`);
+
+Note: `name*` indicates there can be any amount of this object inside the
+containing object (including zero).
