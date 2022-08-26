@@ -1,5 +1,4 @@
-<h1 align="center">Bot of Spades</h1>
-<p align="center">A bot for all things TTRPG!</p>
+<img src="img/bot-of-spades-github-banner.png" align="center" />
 
 ## Modules
 
