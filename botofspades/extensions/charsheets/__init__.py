@@ -85,7 +85,9 @@ class Charsheets(commands.Cog):
             template_path: Path = get_template_path(sheet["template"])
 
             if not template_path.exists():
-                await send(ctx, "TEMPLATE_NOT_FOUND", name=sheet["template"])
+                await send(
+                    ctx, "TEMPLATE_NOT_FOUND", name=sheet["template"].title()
+                )
                 return
 
             with JSONFileWrapperReadOnly(template_path) as template:
@@ -142,9 +144,9 @@ class Charsheets(commands.Cog):
             with JSONFileWrapperUpdate(template_path) as template:
                 template["fields"] = {}
 
-            await send(ctx, "TEMPLATE_CREATED", name=name)
+            await send(ctx, "TEMPLATE_CREATED", name=name.title())
         except FileExistsError:
-            await send(ctx, "TEMPLATE_ALREADY_EXISTS", name=name)
+            await send(ctx, "TEMPLATE_ALREADY_EXISTS", name=name.title())
 
     @template.command(
         name="remove",
@@ -159,9 +161,9 @@ class Charsheets(commands.Cog):
 
             try:
                 template_path.unlink()
-                output_msg += out("TEMPLATE_REMOVED", name=name)
+                output_msg += out("TEMPLATE_REMOVED", name=name.title())
             except FileNotFoundError:
-                output_msg += out("TEMPLATE_NOT_FOUND", name=name)
+                output_msg += out("TEMPLATE_NOT_FOUND", name=name.title())
 
         sheets_changed: int = 0
         for path in get_all_sheet_paths():
@@ -190,11 +192,11 @@ class Charsheets(commands.Cog):
         target_path: Path = get_template_path(new_name)
 
         if not template_path.exists():
-            await send(ctx, "TEMPLATE_NOT_FOUND", name=old_name)
+            await send(ctx, "TEMPLATE_NOT_FOUND", name=old_name.title())
             return
 
         if target_path.exists():
-            await send(ctx, "TEMPLATE_ALREADY_EXISTS", name=new_name)
+            await send(ctx, "TEMPLATE_ALREADY_EXISTS", name=new_name.title())
             return
 
         template_path.rename(target_path)
@@ -265,25 +267,28 @@ class Charsheets(commands.Cog):
         template_path: Path = get_template_path(template_name)
 
         if not template_path.exists():
-            await send(ctx, "TEMPLATE_NOT_FOUND", name=template_name)
+            await send(ctx, "TEMPLATE_NOT_FOUND", name=template_name.title())
             return
 
         default_value: Any = None
 
-        if not FIELD_TYPES[type].validate(default):
-            await send(
-                ctx, "INVALID_DEFAULT_FIELD_VALUE",
-                value=default,
-                type=type
-            )
-            return
+        if default:
+            if not FIELD_TYPES[type].validate(default):
+                await send(
+                    ctx, "INVALID_DEFAULT_FIELD_VALUE",
+                    value=default,
+                    type=type
+                )
+                return
 
-        default_value = FIELD_TYPES[type].from_str(default)
+            default_value = FIELD_TYPES[type].from_str(default)
 
         output_msg: str = ""
         with JSONFileWrapperUpdate(template_path) as template:
             if field_name in template["fields"]:
-                await send(ctx, "FIELD_ALREADY_EXISTS", name=field_name)
+                await send(
+                    ctx, "FIELD_ALREADY_EXISTS", name=field_name.title()
+                )
                 return
 
             template["fields"][field_name] = {
@@ -300,7 +305,9 @@ class Charsheets(commands.Cog):
             )
 
         sheets_changed: int = 0
+        await botsend(ctx, "Here, perhaps?")
         for path in get_all_sheet_paths():
+            await botsend(ctx, "Here it does get.")
             with JSONFileWrapperUpdate(path) as sheet:
                 if sheet["template"] == template_name:
                     sheet["fields"][field_name] = default_value
@@ -323,7 +330,7 @@ class Charsheets(commands.Cog):
         template_path: Path = get_template_path(template_name)
 
         if not template_path.exists():
-            await send(ctx, "TEMPLATE_NOT_FOUND", name=template_name)
+            await send(ctx, "TEMPLATE_NOT_FOUND", name=template_name.title())
             return
 
         field_list: list[str] = [name.lower() for name in field_names]
@@ -333,7 +340,7 @@ class Charsheets(commands.Cog):
             for field_name in field_list.copy():
                 if field_name not in template["fields"]:
                     output_msg += (
-                        out("FIELD_NOT_FOUND", name=field_name)
+                        out("FIELD_NOT_FOUND", name=field_name.title())
                     )
                     field_list.remove(field_name)
 
@@ -377,17 +384,17 @@ class Charsheets(commands.Cog):
         template_path: Path = get_template_path(template_name)
 
         if not template_path.exists():
-            await send(ctx, "TEMPLATE_NOT_FOUND", name=template_name)
+            await send(ctx, "TEMPLATE_NOT_FOUND", name=template_name.title())
             return
 
         output_msg: str = ""
         with JSONFileWrapperUpdate(template_path) as template:
             if not old_name in template["fields"]:
-                await send(ctx, "FIELD_NOT_FOUND", name=old_name)
+                await send(ctx, "FIELD_NOT_FOUND", name=old_name.title())
                 return
 
             if new_name in template["fields"]:
-                await send(ctx, "FIELD_ALREADY_EXISTS", name=new_name)
+                await send(ctx, "FIELD_ALREADY_EXISTS", name=new_name.title())
                 return
 
             field: dict = template["fields"][old_name]
@@ -432,7 +439,7 @@ class Charsheets(commands.Cog):
         template_path: Path = get_template_path(template_name)
 
         if not template_path.exists():
-            await send(ctx, "TEMPLATE_NOT_FOUND", name=template_name)
+            await send(ctx, "TEMPLATE_NOT_FOUND", name=template_name.title())
             return
 
         listed_fields: str = ""
@@ -482,7 +489,7 @@ class Charsheets(commands.Cog):
         template_path: Path = get_template_path(template_name)
 
         if not template_path.exists():
-            await send(ctx, "TEMPLATE_NOT_FOUND", name=template_name)
+            await send(ctx, "TEMPLATE_NOT_FOUND", name=template_name.title())
             return
 
         default_value: Any = None
@@ -503,7 +510,7 @@ class Charsheets(commands.Cog):
         output_msg: str = ""
         with JSONFileWrapperUpdate(template_path) as template:
             if field_name not in template["fields"]:
-                await send(ctx, "FIELD_NOT_FOUND", name=field_name)
+                await send(ctx, "FIELD_NOT_FOUND", name=field_name.title())
                 return
 
             template["fields"][field_name] = {
@@ -542,7 +549,7 @@ class Charsheets(commands.Cog):
         template_path: Path = get_template_path(template_name)
 
         if not template_path.exists():
-            await send(ctx, "TEMPLATE_NOT_FOUND", name=template_name)
+            await send(ctx, "TEMPLATE_NOT_FOUND", name=template_name.title())
             return
 
         sheet_path: Path = get_sheet_path(sheet_name)
@@ -564,7 +571,7 @@ class Charsheets(commands.Cog):
                 name=get_template_sheet_str(template_name, sheet_name)
             )
         except FileExistsError:
-            await send(ctx, "SHEET_ALREADY_EXISTS", name=sheet_name)
+            await send(ctx, "SHEET_ALREADY_EXISTS", name=sheet_name.title())
 
     @sheet.command(
         name="remove", aliases=("rm",), usage="charsheets sheet remove <name>*"
@@ -576,9 +583,9 @@ class Charsheets(commands.Cog):
 
             try:
                 sheet_path.unlink()
-                output_msg += out("SHEET_REMOVED", name=name)
+                output_msg += out("SHEET_REMOVED", name=name.title())
             except FileNotFoundError:
-                output_msg += out("SHEET_NOT_FOUND", name=name)
+                output_msg += out("SHEET_NOT_FOUND", name=name.title())
 
         await ctx.message.reply(output_msg)
 
@@ -594,13 +601,13 @@ class Charsheets(commands.Cog):
         old_path: Path = get_sheet_path(old_name)
 
         if not old_path.exists():
-            await send(ctx, "SHEET_NOT_FOUND", name=old_name)
+            await send(ctx, "SHEET_NOT_FOUND", name=old_name.title())
             return
 
         new_path: Path = get_sheet_path(new_name)
 
         if new_path.exists():
-            await send(ctx, "SHEET_ALREADY_EXISTS", name=new_name)
+            await send(ctx, "SHEET_ALREADY_EXISTS", name=new_name.title())
             return
 
         old_path.rename(new_path)
@@ -611,7 +618,7 @@ class Charsheets(commands.Cog):
     )
     async def sheet_list(self, ctx, template: str = "") -> None:
         if template and not get_template_path(template).exists():
-            await send(ctx, "TEMPLATE_NOT_FOUND", name=template)
+            await send(ctx, "TEMPLATE_NOT_FOUND", name=template.title())
             return
 
         sheet_list: list[str] = []
@@ -642,7 +649,7 @@ class Charsheets(commands.Cog):
         sheet_path: Path = get_sheet_path(name)
 
         if not sheet_path.exists():
-            await send(ctx, "SHEET_NOT_FOUND", name=name)
+            await send(ctx, "SHEET_NOT_FOUND", name=name.title())
             return
 
         output_msg: str = f"```\n{name.upper()}\n"
@@ -650,7 +657,9 @@ class Charsheets(commands.Cog):
             template_path: Path = get_template_path(sheet["template"])
 
             if not template_path.exists():
-                await send(ctx, "TEMPLATE_NOT_FOUND", name=sheet["template"])
+                await send(
+                    ctx, "TEMPLATE_NOT_FOUND", name=sheet["template"].title()
+                )
                 return
 
             with JSONFileWrapperReadOnly(template_path) as template:
@@ -679,7 +688,7 @@ class Charsheets(commands.Cog):
         sheet_path: Path = get_sheet_path(sheet_name)
 
         if not sheet_path.exists():
-            await send(ctx, "SHEET_NOT_FOUND", name=sheet_name)
+            await send(ctx, "SHEET_NOT_FOUND", name=sheet_name.title())
             return
 
         if value:
@@ -689,7 +698,7 @@ class Charsheets(commands.Cog):
         else:
             with JSONFileWrapperReadOnly(sheet_path) as sheet:
                 if field_name not in sheet["fields"]:
-                    await send(ctx, "FIELD_NOT_FOUND", name=field_name)
+                    await send(ctx, "FIELD_NOT_FOUND", name=field_name.title())
                     return
 
                 template_path: Path = get_sheet_path(sheet["template"])

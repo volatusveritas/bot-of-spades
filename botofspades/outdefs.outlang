@@ -12,36 +12,34 @@ NO_SUBCOMMAND
     No valid subcommand provided. Available subcommands: {subcommands}.
 
 TEMPLATE_NOT_FOUND
-    {Emoji.ERROR} Template **{name.title()}** not found.
+    {Emoji.ERROR} Template **{name}** not found.
 
 TEMPLATE_CREATED
-    {Emoji.SUCCESS} Template **{name.title()}** successfully created.
+    {Emoji.SUCCESS} Template **{name}** successfully created.
 
 TEMPLATE_REMOVED
-    {Emoji.SUCCESS} Template **{name.title()}** successfully removed.
+    {Emoji.SUCCESS} Template **{name}** successfully removed.
 
 TEMPLATE_RENAMED
-    {Emoji.SUCCESS} Template **{old.title()}** successfully renamed to
-    **{new.title()}**.
+    {Emoji.SUCCESS} Template **{old}** successfully renamed to **{new}**.
 
 TEMPLATE_ALREADY_EXISTS
-    {Emoji.ERROR} Template **{name.title()}** already exists.
+    {Emoji.ERROR} Template **{name}** already exists.
 
 SHEET_CREATED
-    {Emoji.SUCCESS} Sheet **{name.title()}** successfully created.
+    {Emoji.SUCCESS} Sheet **{name}** successfully created.
 
 SHEET_REMOVED
-    {Emoji.SUCCESS} Sheet **{name.title()}** successfully removed.
+    {Emoji.SUCCESS} Sheet **{name}** successfully removed.
 
 SHEET_RENAMED
-    {Emoji.SUCCESS} Sheet **{old.title()}** successfully renamed to
-    **{new.title()}**.
+    {Emoji.SUCCESS} Sheet **{old}** successfully renamed to **{new}**.
 
 SHEET_NOT_FOUND
-    {Emoji.ERROR} Sheet **{name.title()}** not found.
+    {Emoji.ERROR} Sheet **{name}** not found.
 
 SHEET_ALREADY_EXISTS
-    {Emoji.ERROR} Sheet **{name.title()}** already exists.
+    {Emoji.ERROR} Sheet **{name}** already exists.
 
 SHEETS_REMOVED
     {Emoji.INFO} Sheets removed: {amount}.
@@ -53,43 +51,39 @@ FIELD_VALUE_SET
     {Emoji.SUCCESS} Value of **{field}** set to {value}.
 
 FIELD_ALREADY_EXISTS
-    {Emoji.ERROR} Field **{name.title()}** already exists.
+    {Emoji.ERROR} Field **{name}** already exists.
 
 FIELD_ADDED
     {Emoji.SUCCESS}
-    Field **{field.title()}** successfully added to template
-    **{template.title()}**.
+    Field **{field}** successfully added to template **{template}**.
 
 FIELD_REMOVED
     {Emoji.SUCCESS}
-    Field **{field.title()}** successfully removed from template
-    **{template.title()}**.
+    Field **{field}** successfully removed from template **{template}**.
 
 FIELD_RENAMED
-    {Emoji.SUCCESS} Field **{field.title()}** successfully renamed to
-    **{new.title()}**.
+    {Emoji.SUCCESS} Field **{field}** successfully renamed to **{new}**.
 
 FIELD_UPDATED
-    {Emoji.SUCCESS} Field **{field.title()}** successfully updated to
-    **{new.title()}**.
+    {Emoji.SUCCESS} Field **{field}** successfully updated to **{new}**.
 
 FIELD_NOT_FOUND
-    {Emoji.ERROR} Field **{name.title()}** not found.
+    {Emoji.ERROR} Field **{name}** not found.
 
 FIELD_LIST
-    {Emoji.INFO} Fields in **{template.title()}**:{fields}
+    {Emoji.INFO} Fields in **{template}**:{fields}
 
 NO_FIELDS
-    {Emoji.INFO} No fields found in template **{template.title()}**.
+    {Emoji.INFO} No fields found in template **{template}**.
 
 INVALID_DEFAULT_FIELD_VALUE
-    {Emoji.ERROR} Invalid default value '{value}' for type {type.title()}.
+    {Emoji.ERROR} Invalid default value '{value}' for type {type}.
 
 INVALID_FIELD_VALUE
-    {Emoji.ERROR} Invalid value '{value}' for type {type.title()}.
+    {Emoji.ERROR} Invalid value '{value}' for type {type}.
 
 INVALID_FIELD_TYPE
-    {Emoji.ERROR} Invalid type **{type.title()}**.
+    {Emoji.ERROR} Invalid type **{type}**.
 
 MISSING_ARGUMENT
     {Emoji.ERROR} Missing argument `{param}`. Usage: `{usage}`.
@@ -107,8 +101,7 @@ NO_SHEETS_AVAILABLE
     {Emoji.ERROR} No sheets available.
 
 INVALID_FIELD_TEMPLATE
-    {Emoji.ERROR} Invalid template **{template.title()}** for field
-    **{field.title()}**.
+    {Emoji.ERROR} Invalid template **{template}** for field **{field}**.
 
 FIELD_VALUE
     {Emoji.INFO} Field value: **{field_str}**.
