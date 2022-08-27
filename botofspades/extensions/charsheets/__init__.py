@@ -10,8 +10,6 @@ from botofspades.extensions.charsheets.types import *
 
 
 EXTENSION_NAME: str = "Charsheets"
-TEMPLATE_EXTENSION: str = "cstemplate"
-CHARSHEET_EXTENSION: str = "cscharsheet"
 
 base_dir: Path = Path.cwd() / "charsheets"
 templates_dir: Path = base_dir / "templates"
@@ -28,11 +26,19 @@ FIELD_TYPES: dict[str, type[Field]] = {
 
 
 def get_template_path(name: str) -> Path:
-    return templates_dir / f"{name}.{TEMPLATE_EXTENSION}"
+    return templates_dir / f"{name}.json"
 
 
 def get_sheet_path(name: str) -> Path:
-    return charsheets_dir / f"{name}.{CHARSHEET_EXTENSION}"
+    return charsheets_dir / f"{name}.json"
+
+
+def get_all_template_paths():
+    return templates_dir.glob("*.json")
+
+
+def get_all_sheet_paths():
+    return charsheets_dir.glob("*.json")
 
 
 def get_template_sheet_str(template: str, sheet: str) -> str:
@@ -86,7 +92,7 @@ class Charsheets(commands.Cog):
                 type: str = template["fields"][field_name]["type"]
 
                 try:
-                    new_value: Any = FIELD_TYPES[type](value).to_python_obj()
+                    new_value: Any = FIELD_TYPES[type].from_str(value)
                     sheet["fields"][field_name] = new_value
 
                     field_name = get_sheet_field_str(
@@ -102,7 +108,7 @@ class Charsheets(commands.Cog):
                     await send(
                         ctx, "INVALID_FIELD_VALUE",
                         value=value,
-                        type=type.title()
+                        type=type
                     )
 
     @commands.Cog.listener()
@@ -136,9 +142,9 @@ class Charsheets(commands.Cog):
             with JSONFileWrapperUpdate(template_path) as template:
                 template["fields"] = {}
 
-            await send(ctx, "TEMPLATE_CREATED", name=name.title())
+            await send(ctx, "TEMPLATE_CREATED", name=name)
         except FileExistsError:
-            await send(ctx, "TEMPLATE_ALREADY_EXISTS", name=name.title())
+            await send(ctx, "TEMPLATE_ALREADY_EXISTS", name=name)
 
     @template.command(
         name="remove",
@@ -158,15 +164,13 @@ class Charsheets(commands.Cog):
                 output_msg += out("TEMPLATE_NOT_FOUND", name=name)
 
         sheets_changed: int = 0
-        for path in charsheets_dir.glob(f"*.{CHARSHEET_EXTENSION}"):
-            remove_sheet: bool = False
+        for path in get_all_sheet_paths():
             with JSONFileWrapperReadOnly(path) as sheet:
-                if sheet["template"] in name_list:
-                    remove_sheet = True
+                if sheet["template"] not in name_list:
+                    continue
 
-            if remove_sheet:
-                path.unlink()
-                sheets_changed += 1
+            path.unlink()
+            sheets_changed += 1
 
         if sheets_changed:
             output_msg += out("SHEETS_REMOVED", amount=sheets_changed)
@@ -196,7 +200,7 @@ class Charsheets(commands.Cog):
         template_path.rename(target_path)
 
         sheets_changed: int = 0
-        for path in charsheets_dir.glob(f"*.{CHARSHEET_EXTENSION}"):
+        for path in get_all_sheet_paths():
             with JSONFileWrapperUpdate(path) as sheet:
                 if sheet["template"] == old_name:
                     sheet["template"] = new_name
@@ -215,7 +219,7 @@ class Charsheets(commands.Cog):
     async def template_list(self, ctx) -> None:
         template_names: list[str] = [
             template_path.stem.title()
-            for template_path in templates_dir.glob(f"*.{TEMPLATE_EXTENSION}")
+            for template_path in get_all_template_paths()
         ]
 
         await botsend(
@@ -265,17 +269,16 @@ class Charsheets(commands.Cog):
             return
 
         default_value: Any = None
-        if default:
-            try:
-                default_value = FIELD_TYPES[type](default).to_python_obj()
-            except Exception as e:
-                await send(
-                    ctx, "INVALID_DEFAULT_FIELD_VALUE",
-                    value=default,
-                    type=type
-                )
-                print(e)
-                return
+
+        if not FIELD_TYPES[type].validate(default):
+            await send(
+                ctx, "INVALID_DEFAULT_FIELD_VALUE",
+                value=default,
+                type=type
+            )
+            return
+
+        default_value = FIELD_TYPES[type].from_str(default)
 
         output_msg: str = ""
         with JSONFileWrapperUpdate(template_path) as template:
@@ -297,7 +300,7 @@ class Charsheets(commands.Cog):
             )
 
         sheets_changed: int = 0
-        for path in charsheets_dir.glob(f"*.{CHARSHEET_EXTENSION}"):
+        for path in get_all_sheet_paths():
             with JSONFileWrapperUpdate(path) as sheet:
                 if sheet["template"] == template_name:
                     sheet["fields"][field_name] = default_value
@@ -347,7 +350,7 @@ class Charsheets(commands.Cog):
                 del template["fields"][field_name]
 
         sheets_changed: int = 0
-        for path in charsheets_dir.glob(f"*.{CHARSHEET_EXTENSION}"):
+        for path in get_all_sheet_paths():
             with JSONFileWrapperUpdate(path) as sheet:
                 if sheet["template"] == template_name:
                     for field_name in field_list:
@@ -357,7 +360,7 @@ class Charsheets(commands.Cog):
 
         output_msg += out("SHEETS_UPDATED", amount=sheets_changed)
 
-        await ctx.message.reply(output_msg)
+        await botsend(ctx, output_msg)
 
     @template_field.command(
         name="rename",
@@ -398,7 +401,7 @@ class Charsheets(commands.Cog):
             )
 
         sheets_changed: int = 0
-        for path in charsheets_dir.glob(f"*.{CHARSHEET_EXTENSION}"):
+        for path in get_all_sheet_paths():
             with JSONFileWrapperUpdate(path) as sheet:
                 if sheet["template"] == template_name:
                     field: dict = sheet["fields"][old_name]
@@ -409,7 +412,7 @@ class Charsheets(commands.Cog):
 
         output_msg += out("SHEETS_UPDATED", amount=sheets_changed)
 
-        await ctx.message.reply(output_msg)
+        await botsend(ctx, output_msg)
 
     @template_field.command(
         name="list",
@@ -485,7 +488,7 @@ class Charsheets(commands.Cog):
         default_value: Any = None
         if default:
             try:
-                default_value = FIELD_TYPES[type](default).to_python_obj()
+                default_value = FIELD_TYPES[type].from_str(default)
             except Exception as e:
                 await send(
                     ctx,
@@ -515,7 +518,7 @@ class Charsheets(commands.Cog):
             )
 
         sheets_changed: int = 0
-        for path in charsheets_dir.glob(f"*.{CHARSHEET_EXTENSION}"):
+        for path in get_all_sheet_paths():
             with JSONFileWrapperUpdate(path) as sheet:
                 if sheet["template"] == template_name:
                     sheet["fields"][field_name] = default_value
@@ -601,11 +604,7 @@ class Charsheets(commands.Cog):
             return
 
         old_path.rename(new_path)
-        await send(
-            ctx, "SHEET_RENAMED",
-            old=old_name.title(),
-            new=new_name.title()
-        )
+        await send(ctx, "SHEET_RENAMED", old=old_name, new=new_name)
 
     @sheet.command(
         name="list", aliases=("ls",), usage="charsheets sheet list [template]"
@@ -616,7 +615,7 @@ class Charsheets(commands.Cog):
             return
 
         sheet_list: list[str] = []
-        for sheet_path in charsheets_dir.glob(f"*.{CHARSHEET_EXTENSION}"):
+        for sheet_path in get_all_sheet_paths():
             with JSONFileWrapperReadOnly(sheet_path) as sheet:
                 if not template or sheet["template"] == template:
                     sheet_list.append(
@@ -658,8 +657,8 @@ class Charsheets(commands.Cog):
                 for field in sheet["fields"]:
                     type: str = template['fields'][field]['type']
                     output_msg += (
-                        f"{4 * ' '}{field.title()} ({type.title()})"
-                        f" is {FIELD_TYPES[type](sheet['fields'][field])}\n"
+                        f"{4 * ' '}{field.title()} ({type.title()}) is "
+                        f"{FIELD_TYPES[type].to_str(sheet['fields'][field])}\n"
                     )
 
         output_msg += "```"
@@ -698,7 +697,7 @@ class Charsheets(commands.Cog):
                 if not sheet_path.exists():
                     await send(
                         ctx, "INVALID_FIELD_TEMPLATE",
-                        template=sheet["template"].title(),
+                        template=sheet["template"],
                         field=get_sheet_field_str(
                             sheet_name,
                             field_name,

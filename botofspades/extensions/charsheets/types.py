@@ -1,25 +1,37 @@
 from typing import Any
 
 
+# Any value coming from Discord is a string.
+# Values in a character sheet may be any JSON value.
+# They are otherwise Python values.
+
+# Type name > Discord (string) | JSON | Python
+# --------------------------------------------
+# Abacus > "x" | number("x") | int("x")
+# Rational > "x.y" | number("x.y") | float("x.y")
+# Lever > "on"/"true"/"1"/"off"/"false"/"0" | boolean | bool
+# Scroll > "x" | "x" | "x"
+# Gauge > "x/y" | array[number("x"), number("y")] | list[int("x"), int("y")]
+
+
 class Field:
-    def __init__(self, value: Any) -> None:
-        self._value: Any = value
-
-    def __str__(self) -> str:
-        return str(self._value)
-
     @staticmethod
     def validate(value: Any) -> bool:
+        """Validates a Python value."""
         return False
 
-    def to_python_obj(self) -> Any:
-        return self._value
+    @staticmethod
+    def from_str(value_str: str) -> Any:
+        """Turns a string into a Python value. Expects a valid string."""
+        return value_str
+
+    @staticmethod
+    def to_str(value: Any) -> str:
+        """Turns a Python value into a string. Expects a valid value."""
+        return str(value)
 
 
 class Abacus(Field):
-    def __init__(self, value: Any) -> None:
-        self._value: int = int(value)
-
     @staticmethod
     def validate(value: Any) -> bool:
         try:
@@ -29,14 +41,16 @@ class Abacus(Field):
 
         return True
 
-    def to_python_obj(self) -> int:
-        return self._value
+    @staticmethod
+    def from_str(value_str: str) -> int:
+        return int(value_str)
+
+    @staticmethod
+    def to_str(value: int) -> str:
+        return str(value)
 
 
 class Rational(Field):
-    def __init__(self, value: Any) -> None:
-        self._value: float = float(value)
-
     @staticmethod
     def validate(value: Any) -> bool:
         try:
@@ -46,53 +60,76 @@ class Rational(Field):
 
         return True
 
-    def to_python_obj(self) -> float:
-        return self._value
+    @staticmethod
+    def from_str(value_str: str) -> float:
+        return float(value_str)
+
+    @staticmethod
+    def to_str(value: float) -> str:
+        return str(value)
 
 
 class Lever(Field):
-    def __init__(self, value: Any) -> None:
-        value = value.lower()
+    @staticmethod
+    def validate(value: Any) -> bool:
+        if not isinstance(value, str):
+            try:
+                bool(value)
+            except:
+                return False
 
-        if value in ("on", "true", "1", 1):
-            self._value: bool = True
-        elif value in ("off", "false", "0", 0):
-            self._value: bool = False
-        else:
-            raise ValueError(f"Invalid value '{value}' for Lever field")
+            return True
 
-    def __str__(self) -> str:
-        return "on" if self._value else "off"
+        return value in (
+            "on", "true", "1",
+            "off", "false", "0",
+        )
 
-    def to_python_obj(self) -> bool:
-        return self._value
+    @staticmethod
+    def from_str(value_str: str) -> bool:
+        return value_str in ("on", "true", "1")
+
+    @staticmethod
+    def to_str(value: bool) -> str:
+        return "on" if value else "off"
 
 
 class Scroll(Field):
-    def __init__(self, value: Any) -> None:
-        self._value: str = str(value)
+    @staticmethod
+    def validate(value: Any) -> bool:
+        try:
+            str(value)
+        except:
+            return False
 
-    def to_python_obj(self) -> str:
-        return self._value
+        return True
+
+    @staticmethod
+    def from_str(value_str: str) -> str:
+        return value_str
+
+    @staticmethod
+    def to_str(value: str) -> str:
+        return value
 
 
 class Gauge(Field):
-    def __init__(self, value: Any) -> None:
-        if isinstance(value, (list, tuple)):
-            self._current: int = int(value[0])
-            self._max: int = int(value[1])
-        elif isinstance(value, str):
-            gauge_sides: list[str] = value.split("/")
-            self._current: int = int(gauge_sides[0])
-            self._max: int = int(gauge_sides[1])
-        else:
-            raise TypeError(
-                "Gauge() argument must be a string or a Sequence[int, int],"
-                f" not '{type(value)}'"
+    @staticmethod
+    def validate(value: Any) -> bool:
+        if not isinstance(value, str):
+            return (
+                isinstance(value, (list, tuple))
+                and len(value) >= 2
+                and isinstance(value[0], int)
+                and isinstance(value[1], int)
             )
 
-    def __str__(self) -> str:
-        return f"{self._current}/{self._max}"
+        return False
 
-    def to_python_obj(self) -> tuple[int, int]:
-        return (self._current, self._max)
+    @staticmethod
+    def from_str(value_str: str) -> list[int]:
+        return [int(section) for section in value_str.split("/")]
+
+    @staticmethod
+    def to_str(value: list[int] | tuple[int, int]) -> str:
+        return f"{value[0]}/{value[1]}"
