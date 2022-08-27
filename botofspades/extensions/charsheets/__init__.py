@@ -110,7 +110,7 @@ class Charsheets(commands.Cog):
                     await send(
                         ctx, "INVALID_FIELD_VALUE",
                         value=value,
-                        type=type
+                        type=type.title()
                     )
 
     @commands.Cog.listener()
@@ -261,7 +261,7 @@ class Charsheets(commands.Cog):
         type = type.lower()
 
         if type not in FIELD_TYPES:
-            await send(ctx, "INVALID_FIELD_TYPE", type=type)
+            await send(ctx, "INVALID_FIELD_TYPE", type=type.title())
             return
 
         template_path: Path = get_template_path(template_name)
@@ -277,7 +277,7 @@ class Charsheets(commands.Cog):
                 await send(
                     ctx, "INVALID_DEFAULT_FIELD_VALUE",
                     value=default,
-                    type=type
+                    type=type.title()
                 )
                 return
 
@@ -483,7 +483,7 @@ class Charsheets(commands.Cog):
         type = type.lower()
 
         if type not in FIELD_TYPES:
-            await send(ctx, "INVALID_FIELD_TYPE", type=type)
+            await send(ctx, "INVALID_FIELD_TYPE", type=type.title())
             return
 
         template_path: Path = get_template_path(template_name)
@@ -501,7 +501,7 @@ class Charsheets(commands.Cog):
                     ctx,
                     "INVALID_DEFAULT_FIELD_VALUE",
                     value=default,
-                    type=type
+                    type=type.title()
                 )
 
                 print(e)
