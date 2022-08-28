@@ -448,7 +448,7 @@ class Charsheets(commands.Cog):
             await send(ctx, "TEMPLATE_NOT_FOUND", name=template_name.title())
             return
 
-        listed_fields: str = ""
+        listed_fields: str = "\n"
         with JSONFileWrapperReadOnly(template_path) as template:
             for name, value in template["fields"].items():
                 if type != "any" and value["type"] != type:
