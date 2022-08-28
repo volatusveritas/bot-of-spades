@@ -21,7 +21,7 @@ defdesc_re = re.compile(rf"^\s{{{DEF_INDENT_LEVEL}}}.*\n")
 class Emoji:
     SUCCESS: str = ":star2:"
     INFO: str = ":bell:"
-    ERROR: str = ":small_red_triangle:"
+    ERROR: str = ":small_red_triangle_down:"
 
 
 async def send(ctx, defname: str, **replacements) -> None:

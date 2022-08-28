@@ -7,6 +7,7 @@ from botofspades.outmsg import out, botsend, send
 from botofspades.log import extension_loaded, extension_unloaded
 from botofspades.jsonwrappers import *
 from botofspades.extensions.charsheets.types import *
+from botofspades import unicode
 
 
 EXTENSION_NAME: str = "Charsheets"
@@ -210,7 +211,10 @@ class Charsheets(commands.Cog):
 
         output_msg: str = (
             out("TEMPLATE_RENAMED", old=old_name, new=new_name)
-            + out("SHEETS_UPDATED", amount=sheets_changed)
+            + (
+                out("SHEETS_UPDATED", amount=sheets_changed)
+                if sheets_changed else ""
+            )
         )
 
         await botsend(ctx, output_msg)
@@ -301,11 +305,10 @@ class Charsheets(commands.Cog):
                 field=get_field_str(
                     field_name, template["fields"][field_name]
                 ),
-                template=template_name
+                template=template_name.title()
             )
 
         sheets_changed: int = 0
-        await botsend(ctx, "Here, perhaps?")
         for path in get_all_sheet_paths():
             await botsend(ctx, "Here it does get.")
             with JSONFileWrapperUpdate(path) as sheet:
@@ -313,7 +316,8 @@ class Charsheets(commands.Cog):
                     sheet["fields"][field_name] = default_value
                     sheets_changed += 1
 
-        output_msg += out("SHEETS_UPDATED", amount=sheets_changed)
+        if sheets_changed:
+            output_msg += out("SHEETS_UPDATED", amount=sheets_changed)
 
         await botsend(ctx, output_msg)
 
@@ -365,7 +369,8 @@ class Charsheets(commands.Cog):
 
                     sheets_changed += 1
 
-        output_msg += out("SHEETS_UPDATED", amount=sheets_changed)
+        if sheets_changed:
+            output_msg += out("SHEETS_UPDATED", amount=sheets_changed)
 
         await botsend(ctx, output_msg)
 
@@ -417,7 +422,8 @@ class Charsheets(commands.Cog):
 
                     sheets_changed += 1
 
-        output_msg += out("SHEETS_UPDATED", amount=sheets_changed)
+        if sheets_changed:
+            output_msg += out("SHEETS_UPDATED", amount=sheets_changed)
 
         await botsend(ctx, output_msg)
 
@@ -448,14 +454,16 @@ class Charsheets(commands.Cog):
                 if type != "any" and value["type"] != type:
                     continue
 
-                listed_fields += f"\n- {get_field_str(name, value)}"
+                listed_fields += (
+                    f"\n{unicode.FIELD_ARROW} {get_field_str(name, value)}"
+                )
 
         await botsend(
             ctx,
             (
                 out(
                     "FIELD_LIST",
-                    template=template_name,
+                    template=template_name.title(),
                     fields=f"{listed_fields}"
                 )
             )
@@ -531,7 +539,8 @@ class Charsheets(commands.Cog):
                     sheet["fields"][field_name] = default_value
                     sheets_changed += 1
 
-        output_msg += out("SHEETS_UPDATED", amount=sheets_changed)
+        if sheets_changed:
+            output_msg += out("SHEETS_UPDATED", amount=sheets_changed)
 
         await botsend(ctx, output_msg)
 
