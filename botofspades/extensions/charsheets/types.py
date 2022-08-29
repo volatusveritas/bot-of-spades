@@ -49,6 +49,54 @@ class Abacus(Field):
     def to_str(value: int) -> str:
         return str(value)
 
+    # Type Methods receive the original value, and a list of args passed as a
+    # string. If the type of an arg is invalid, it must raise TypeError.
+    # Possible command for this: cs sh do <sheet> <field> <method> <args>*
+
+    @staticmethod
+    def method_add(value: int, args: str) -> int:
+        to_add: int
+
+        try:
+            to_add = int(args[0])
+        except:
+            raise TypeError
+
+        return value + to_add
+
+    @staticmethod
+    def method_subtract(value: int, args: str) -> int:
+        to_sub: int
+
+        try:
+            to_sub = int(args[0])
+        except:
+            raise TypeError
+
+        return value - to_sub
+
+    @staticmethod
+    def method_multiply(value: int, args: str) -> int:
+        to_mul: int
+
+        try:
+            to_mul = int(args[0])
+        except:
+            raise TypeError
+
+        return value * to_mul
+
+    @staticmethod
+    def method_divide(value: int, args: str) -> int:
+        to_div: int
+
+        try:
+            to_div = int(args[0])
+        except:
+            raise TypeError
+
+        return value // to_div
+
 
 class Rational(Field):
     @staticmethod
@@ -81,8 +129,12 @@ class Lever(Field):
             return True
 
         return value in (
-            "on", "true", "1",
-            "off", "false", "0",
+            "on",
+            "true",
+            "1",
+            "off",
+            "false",
+            "0",
         )
 
     @staticmethod

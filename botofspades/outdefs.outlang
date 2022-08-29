@@ -105,3 +105,12 @@ INVALID_FIELD_TEMPLATE
 
 FIELD_VALUE
     {Emoji.INFO} Field value: **{field_str}**.
+
+METHOD_NOT_FOUND
+    {Emoji.ERROR} Method **{name}** not found.
+
+NULL_FIELD
+    {Emoji.ERROR} Can't operate on the null field **{name}**.
+
+FIELD_UPDATED
+    {Emoji.SUCCESS} Field **{old}** updated to **{new}**.

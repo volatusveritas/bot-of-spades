@@ -4,9 +4,7 @@ from dataclasses import dataclass
 
 
 DEF_INDENT_LEVEL: int = 4
-ESCAPE_SEQUENCES: dict[str, str] = {
-    "\\n": "\n"
-}
+ESCAPE_SEQUENCES: dict[str, str] = {"\\n": "\n"}
 
 
 outdefs_path: Path = Path.cwd() / "botofspades/outdefs.outlang"

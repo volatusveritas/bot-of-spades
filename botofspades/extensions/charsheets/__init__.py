@@ -122,7 +122,8 @@ class Charsheets(commands.Cog):
     ) -> None:
         if isinstance(error, commands.MissingRequiredArgument):
             await send(
-                ctx, "MISSING_ARGUMENT",
+                ctx,
+                "MISSING_ARGUMENT",
                 param=error.param,
                 usage=ctx.command.usage,
             )
@@ -211,12 +212,12 @@ class Charsheets(commands.Cog):
                     sheet["template"] = new_name
                     sheets_changed += 1
 
-        output_msg: str = (
-            out("TEMPLATE_RENAMED", old=old_name, new=new_name)
-            + (
-                out("SHEETS_UPDATED", amount=sheets_changed)
-                if sheets_changed else ""
-            )
+        output_msg: str = out(
+            "TEMPLATE_RENAMED", old=old_name, new=new_name
+        ) + (
+            out("SHEETS_UPDATED", amount=sheets_changed)
+            if sheets_changed
+            else ""
         )
 
         await botsend(ctx, output_msg)
@@ -231,16 +232,19 @@ class Charsheets(commands.Cog):
         ]
 
         await botsend(
-            ctx, (
+            ctx,
+            (
                 out(
                     "AVAILABLE_TEMPLATES",
                     separator=" ",
                     templates=", ".join(
                         [f"**{name}**" for name in template_names]
                     ),
-                    finaldot="."
+                    finaldot=".",
                 )
-            ) if template_names else out("NO_TEMPLATES_AVAILABLE")
+            )
+            if template_names
+            else out("NO_TEMPLATES_AVAILABLE"),
         )
 
     @template.group(name="field", invoke_without_command=True, aliases=("fd",))
@@ -308,7 +312,7 @@ class Charsheets(commands.Cog):
                 field=get_field_str(
                     field_name, template["fields"][field_name]
                 ),
-                template=template_name.title()
+                template=template_name.title(),
             )
 
         sheets_changed: int = 0
@@ -346,8 +350,8 @@ class Charsheets(commands.Cog):
         with JSONFileWrapperUpdate(template_path) as template:
             for field_name in field_list.copy():
                 if field_name not in template["fields"]:
-                    output_msg += (
-                        out("FIELD_NOT_FOUND", name=field_name.title())
+                    output_msg += out(
+                        "FIELD_NOT_FOUND", name=field_name.title()
                     )
                     field_list.remove(field_name)
 
@@ -358,7 +362,7 @@ class Charsheets(commands.Cog):
                     field=get_field_str(
                         field_name, template["fields"][field_name]
                     ),
-                    template=template_name
+                    template=template_name,
                 )
 
                 del template["fields"][field_name]
@@ -412,7 +416,7 @@ class Charsheets(commands.Cog):
             output_msg += out(
                 "FIELD_RENAMED",
                 field=get_field_str(old_name, field),
-                new=new_name
+                new=new_name,
             )
 
         sheets_changed: int = 0
@@ -467,10 +471,11 @@ class Charsheets(commands.Cog):
                 out(
                     "FIELD_LIST",
                     template=template_name.title(),
-                    fields=f"{listed_fields}"
+                    fields=f"{listed_fields}",
                 )
             )
-            if listed_fields else out("NO_FIELDS", template=template_name)
+            if listed_fields
+            else out("NO_FIELDS", template=template_name),
         )
 
     @template_field.command(
@@ -579,8 +584,9 @@ class Charsheets(commands.Cog):
                 }
 
             await send(
-                ctx, "SHEET_CREATED",
-                name=get_template_sheet_str(template_name, sheet_name)
+                ctx,
+                "SHEET_CREATED",
+                name=get_template_sheet_str(template_name, sheet_name),
             )
         except FileExistsError:
             await send(ctx, "SHEET_ALREADY_EXISTS", name=sheet_name.title())
@@ -646,7 +652,7 @@ class Charsheets(commands.Cog):
                 "AVAILABLE_SHEETS",
                 separator="",
                 templates="".join([f"\n- {sheet}" for sheet in sheet_list]),
-                finaldot=""
+                finaldot="",
             )
             if sheet_list
             else out("NO_SHEETS_AVAILABLE")
@@ -676,7 +682,7 @@ class Charsheets(commands.Cog):
 
             with JSONFileWrapperReadOnly(template_path) as template:
                 for field in sheet["fields"]:
-                    type: str = template['fields'][field]['type']
+                    type: str = template["fields"][field]["type"]
                     output_msg += (
                         f"{4 * ' '}{field.title()} ({type.title()}) is "
                         f"{FIELD_TYPES[type].to_str(sheet['fields'][field])}\n"
@@ -707,36 +713,101 @@ class Charsheets(commands.Cog):
             await self._update_field(
                 ctx, sheet_name, field_name, sheet_path, value
             )
-        else:
-            with JSONFileWrapperReadOnly(sheet_path) as sheet:
-                if field_name not in sheet["fields"]:
-                    await send(ctx, "FIELD_NOT_FOUND", name=field_name.title())
-                    return
+            return
 
-                template_path: Path = get_sheet_path(sheet["template"])
+        with JSONFileWrapperReadOnly(sheet_path) as sheet:
+            if field_name not in sheet["fields"]:
+                await send(ctx, "FIELD_NOT_FOUND", name=field_name.title())
+                return
 
-                if not sheet_path.exists():
+            template_path: Path = get_template_path(sheet["template"])
+
+            if not template_path.exists():
+                await send(
+                    ctx,
+                    "INVALID_FIELD_TEMPLATE",
+                    template=sheet["template"],
+                    field=get_sheet_field_str(
+                        sheet_name, field_name, sheet["fields"][field_name]
+                    ),
+                )
+                return
+
+            with JSONFileWrapperReadOnly(template_path) as template:
+                await send(
+                    ctx,
+                    "FIELD_VALUE",
+                    field_str=get_full_field_str(
+                        sheet_name,
+                        field_name,
+                        template["fields"][field_name]["type"],
+                        sheet["fields"][field_name],
+                    ),
+                )
+
+    @sheet.command(
+        name="do", usage="charsheets sheet do <sheet> <field> <method> <arg>*"
+    )
+    async def sheet_do(
+        self,
+        ctx,
+        sheet_name: str,
+        field_name: str,
+        method_name: str,
+        *args: str,
+    ):
+        sheet_name = sheet_name.lower()
+        field_name = field_name.lower()
+        method_name = method_name.lower()
+
+        sheet_path: Path = get_sheet_path(sheet_name)
+
+        if not sheet_path.exists():
+            await send(ctx, "SHEET_NOT_FOUND", name=sheet_name.title())
+            return
+
+        with JSONFileWrapperUpdate(sheet_path) as sheet:
+            if field_name not in sheet["fields"]:
+                await send(ctx, "FIELD_NOT_FOUND", name=field_name.title())
+                return
+
+            if sheet["fields"][field_name] is None:
+                await send(ctx, "NULL_FIELD", name=field_name.title())
+                return
+
+            template_path: Path = get_template_path(sheet["template"])
+
+            if not template_path.exists():
+                await send(
+                    ctx, "TEMPLATE_NOT_FOUND", name=sheet["template"].title()
+                )
+                return
+
+            with JSONFileWrapperReadOnly(template_path) as template:
+                method = getattr(
+                    FIELD_TYPES[template["fields"][field_name]["type"]],
+                    f"method_{method_name}",
+                    None,
+                )
+
+                if not method:
                     await send(
-                        ctx, "INVALID_FIELD_TEMPLATE",
-                        template=sheet["template"],
-                        field=get_sheet_field_str(
-                            sheet_name,
-                            field_name,
-                            sheet["fields"][field_name]
-                        )
+                        ctx, "METHOD_NOT_FOUND", name=method_name.title()
                     )
                     return
 
-                with JSONFileWrapperReadOnly(template_path) as template:
-                    await send(
-                        ctx, "FIELD_VALUE",
-                        field_str=get_full_field_str(
-                            sheet_name,
-                            field_name,
-                            template["fields"][field_name]["type"],
-                            sheet["fields"][field_name]
-                        )
-                    )
+                old_value: Any = sheet["fields"][field_name]
+
+                sheet["fields"][field_name] = method(old_value, args)
+
+                await send(
+                    ctx,
+                    "FIELD_UPDATED",
+                    old=get_sheet_field_str(
+                        sheet_name, field_name, template["fields"][field_name]
+                    ),
+                    new=sheet["fields"][field_name],
+                )
 
 
 def setup(bot: commands.Bot) -> None:
