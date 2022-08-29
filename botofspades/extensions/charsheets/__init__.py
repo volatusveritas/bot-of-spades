@@ -635,6 +635,8 @@ class Charsheets(commands.Cog):
         name="list", aliases=("ls",), usage="charsheets sheet list [template]"
     )
     async def sheet_list(self, ctx, template: str = "") -> None:
+        template = template.lower()
+
         if template and not get_template_path(template).exists():
             await send(ctx, "TEMPLATE_NOT_FOUND", name=template.title())
             return
