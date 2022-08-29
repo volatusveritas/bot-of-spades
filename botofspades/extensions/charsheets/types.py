@@ -1,4 +1,5 @@
 from typing import Any
+from math import floor
 
 
 # Any value coming from Discord is a string.
@@ -54,7 +55,7 @@ class Abacus(Field):
     # Possible command for this: cs sh do <sheet> <field> <method> <args>*
 
     @staticmethod
-    def method_add(value: int, args: str) -> int:
+    def method_add(value: int, args: tuple[str, ...]) -> int:
         to_add: int
 
         try:
@@ -65,7 +66,7 @@ class Abacus(Field):
         return value + to_add
 
     @staticmethod
-    def method_subtract(value: int, args: str) -> int:
+    def method_subtract(value: int, args: tuple[str, ...]) -> int:
         to_sub: int
 
         try:
@@ -76,7 +77,7 @@ class Abacus(Field):
         return value - to_sub
 
     @staticmethod
-    def method_multiply(value: int, args: str) -> int:
+    def method_multiply(value: int, args: tuple[str, ...]) -> int:
         to_mul: int
 
         try:
@@ -87,7 +88,7 @@ class Abacus(Field):
         return value * to_mul
 
     @staticmethod
-    def method_divide(value: int, args: str) -> int:
+    def method_divide(value: int, args: tuple[str, ...]) -> int:
         to_div: int
 
         try:
@@ -115,6 +116,55 @@ class Rational(Field):
     @staticmethod
     def to_str(value: float) -> str:
         return str(value)
+
+    @staticmethod
+    def method_add(value: float, args: tuple[str, ...]) -> float:
+        to_add: float
+
+        try:
+            to_add = float(args[0])
+        except:
+            raise TypeError
+
+        return value + to_add
+
+    @staticmethod
+    def method_subtract(value: float, args: tuple[str, ...]) -> float:
+        to_sub: float
+
+        try:
+            to_sub = float(args[0])
+        except:
+            raise TypeError
+
+        return value - to_sub
+
+    @staticmethod
+    def method_multiply(value: float, args: tuple[str, ...]) -> float:
+        to_mul: float
+
+        try:
+            to_mul = float(args[0])
+        except:
+            raise TypeError
+
+        return value * to_mul
+
+    @staticmethod
+    def method_divide(value: float, args: tuple[str, ...]) -> float:
+        to_div: float
+
+        try:
+            to_div = float(args[0])
+        except:
+            raise TypeError
+
+        return value / to_div
+
+    @staticmethod
+    def method_round(value: float, args: tuple[str, ...]) -> float:
+        # HACK: Manual float correction so a value of exactly 0.5 rounds down.
+        return floor(value + 0.5 - 1e-16)
 
 
 class Lever(Field):

@@ -647,7 +647,8 @@ class Charsheets(commands.Cog):
                         get_sheet_str(sheet_path.stem, sheet["template"])
                     )
 
-        await ctx.message.reply(
+        await botsend(
+            ctx,
             out(
                 "AVAILABLE_SHEETS",
                 separator="",
@@ -810,13 +811,13 @@ class Charsheets(commands.Cog):
                 )
 
 
-def setup(bot: commands.Bot) -> None:
-    bot.add_cog(Charsheets())
+async def setup(bot: commands.Bot) -> None:
+    await bot.add_cog(Charsheets())
     extension_loaded(EXTENSION_NAME)
 
 
-def teardown(bot: commands.Bot) -> None:
-    bot.remove_cog("Charsheets")
+async def teardown(bot: commands.Bot) -> None:
+    await bot.remove_cog("Charsheets")
     extension_unloaded(EXTENSION_NAME)
 
 

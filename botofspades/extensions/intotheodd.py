@@ -38,11 +38,11 @@ class IntoTheOdd(commands.Cog):
         )
 
 
-def setup(bot: commands.Bot) -> None:
-    bot.add_cog(IntoTheOdd())
+async def setup(bot: commands.Bot) -> None:
+    await bot.add_cog(IntoTheOdd())
     extension_loaded(EXTENSION_NAME)
 
 
-def teardown(bot: commands.Bot) -> None:
-    bot.remove_cog("IntoTheOdd")
+async def teardown(bot: commands.Bot) -> None:
+    await bot.remove_cog("IntoTheOdd")
     extension_unloaded(EXTENSION_NAME)

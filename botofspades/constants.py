@@ -1,4 +1,4 @@
-PREFIXES: tuple[str, ...] = ("spades.", "bos.", "&")
+PREFIXES: list[str] = ["spades.", "bos.", "&"]
 DEFAULT_EXTENSIONS: tuple[str, ...] = (
     "botcontrol",
     "intotheodd",

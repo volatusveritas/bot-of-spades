@@ -1,4 +1,3 @@
-from abc import update_abstractmethods
 from discord.ext import commands
 
 from botofspades import constants
@@ -16,18 +15,18 @@ class BotControl(commands.Cog):
     @commands.command()
     async def reload(self, ctx) -> None:
         for ext in constants.DEFAULT_EXTENSIONS:
-            self.bot.reload_extension(f"botofspades.extensions.{ext}")
+            await self.bot.reload_extension(f"botofspades.extensions.{ext}")
 
         update_defbank()
 
         await botsend(ctx, "Bot reloaded.")
 
 
-def setup(bot: commands.Bot) -> None:
-    bot.add_cog(BotControl(bot))
+async def setup(bot: commands.Bot) -> None:
+    await bot.add_cog(BotControl(bot))
     extension_loaded(EXTENSION_NAME)
 
 
-def teardown(bot: commands.Bot) -> None:
-    bot.remove_cog("BotControl")
+async def teardown(bot: commands.Bot) -> None:
+    await bot.remove_cog("BotControl")
     extension_unloaded(EXTENSION_NAME)

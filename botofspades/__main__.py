@@ -1,3 +1,6 @@
+import asyncio
+
+from discord import Intents
 from discord.ext import commands
 
 from botofspades import constants
@@ -5,10 +8,16 @@ from botofspades.log import logger, setup_logging
 from botofspades.outmsg import update_defbank
 
 
+def get_bot_intents() -> Intents:
+    intents: Intents = Intents.default()
+    intents.message_content = True
+    return intents
+
+
 class BotOfSpades(commands.Bot):
-    def load_default_exts(self) -> None:
+    async def load_default_exts(self) -> None:
         for ext in constants.DEFAULT_EXTENSIONS:
-            self.load_extension(f"botofspades.extensions.{ext}")
+            await self.load_extension(f"botofspades.extensions.{ext}")
 
     async def on_ready(self) -> None:
         logger.info("Bot ready to receive commands")
@@ -21,6 +30,9 @@ setup_logging()
 with open(".BOT_TOKEN", "r") as token_file:
     TOKEN: str = token_file.read()
 
-bot: BotOfSpades = BotOfSpades(constants.PREFIXES)
-bot.load_default_exts()
+bot: BotOfSpades = BotOfSpades(
+    command_prefix=constants.PREFIXES,
+    intents=get_bot_intents()
+)
+asyncio.run(bot.load_default_exts())
 bot.run(TOKEN)
