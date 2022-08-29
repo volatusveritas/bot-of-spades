@@ -92,26 +92,28 @@ class Charsheets(commands.Cog):
                 return
 
             with JSONFileWrapperReadOnly(template_path) as template:
-                type: str = template["fields"][field_name]["type"]
+                type_name: str = template["fields"][field_name]["type"]
 
                 try:
-                    new_value: Any = FIELD_TYPES[type].from_str(value)
+                    new_value: Any = FIELD_TYPES[type_name].from_str(value)
                     sheet["fields"][field_name] = new_value
 
-                    field_name = get_sheet_field_str(
-                        sheet_name, field_name, template["fields"][field_name]
-                    )
-
                     await send(
-                        ctx, "FIELD_VALUE_SET",
-                        field=field_name,
-                        value=sheet["fields"][field_name]
+                        ctx,
+                        "FIELD_VALUE_SET",
+                        field=get_sheet_field_str(
+                            sheet_name,
+                            field_name,
+                            template["fields"][field_name],
+                        ),
+                        value=sheet["fields"][field_name],
                     )
-                except Exception:
+                except:
                     await send(
-                        ctx, "INVALID_FIELD_VALUE",
+                        ctx,
+                        "INVALID_FIELD_VALUE",
                         value=value,
-                        type=type.title()
+                        type=type_name.title(),
                     )
 
     @commands.Cog.listener()
@@ -257,15 +259,15 @@ class Charsheets(commands.Cog):
         ctx,
         template_name: str,
         field_name: str,
-        type: str,
+        type_name: str,
         default: str = "",
     ) -> None:
         template_name = template_name.lower()
         field_name = field_name.lower()
-        type = type.lower()
+        type_name = type_name.lower()
 
-        if type not in FIELD_TYPES:
-            await send(ctx, "INVALID_FIELD_TYPE", type=type.title())
+        if type_name not in FIELD_TYPES:
+            await send(ctx, "INVALID_FIELD_TYPE", type=type_name.title())
             return
 
         template_path: Path = get_template_path(template_name)
@@ -277,15 +279,16 @@ class Charsheets(commands.Cog):
         default_value: Any = None
 
         if default:
-            if not FIELD_TYPES[type].validate(default):
+            if not FIELD_TYPES[type_name].validate(default):
                 await send(
-                    ctx, "INVALID_DEFAULT_FIELD_VALUE",
+                    ctx,
+                    "INVALID_DEFAULT_FIELD_VALUE",
                     value=default,
-                    type=type.title()
+                    type=type_name.title(),
                 )
                 return
 
-            default_value = FIELD_TYPES[type].from_str(default)
+            default_value = FIELD_TYPES[type_name].from_str(default)
 
         output_msg: str = ""
         with JSONFileWrapperUpdate(template_path) as template:
@@ -296,7 +299,7 @@ class Charsheets(commands.Cog):
                 return
 
             template["fields"][field_name] = {
-                "type": type,
+                "type": type_name,
                 "default": default_value,
             }
 
@@ -433,13 +436,13 @@ class Charsheets(commands.Cog):
         usage="charsheets template field list [type]",
     )
     async def template_field_list(
-        self, ctx, template_name: str, type: str = "any"
+        self, ctx, template_name: str, type_name: str = "any"
     ) -> None:
         template_name = template_name.lower()
-        type = type.lower()
+        type_name = type_name.lower()
 
-        if type != "any" and type not in FIELD_TYPES:
-            await ctx.message.reply(f"Invalid type **{type}**.")
+        if type_name != "any" and type_name not in FIELD_TYPES:
+            await ctx.message.reply(f"Invalid type **{type_name}**.")
             return
 
         template_path: Path = get_template_path(template_name)
@@ -451,7 +454,7 @@ class Charsheets(commands.Cog):
         listed_fields: str = "\n"
         with JSONFileWrapperReadOnly(template_path) as template:
             for name, value in template["fields"].items():
-                if type != "any" and value["type"] != type:
+                if type_name != "any" and value["type"] != type_name:
                     continue
 
                 listed_fields += (
@@ -483,15 +486,15 @@ class Charsheets(commands.Cog):
         ctx,
         template_name: str,
         field_name: str,
-        type: str,
+        type_name: str,
         default: str = "",
     ) -> None:
         template_name = template_name.lower()
         field_name = field_name.lower()
-        type = type.lower()
+        type_name = type_name.lower()
 
-        if type not in FIELD_TYPES:
-            await send(ctx, "INVALID_FIELD_TYPE", type=type.title())
+        if type_name not in FIELD_TYPES:
+            await send(ctx, "INVALID_FIELD_TYPE", type=type_name.title())
             return
 
         template_path: Path = get_template_path(template_name)
@@ -503,13 +506,13 @@ class Charsheets(commands.Cog):
         default_value: Any = None
         if default:
             try:
-                default_value = FIELD_TYPES[type].from_str(default)
+                default_value = FIELD_TYPES[type_name].from_str(default)
             except Exception as e:
                 await send(
                     ctx,
                     "INVALID_DEFAULT_FIELD_VALUE",
                     value=default,
-                    type=type.title()
+                    type=type_name.title(),
                 )
 
                 print(e)
@@ -522,14 +525,14 @@ class Charsheets(commands.Cog):
                 return
 
             template["fields"][field_name] = {
-                "type": type,
+                "type": type_name,
                 "default": default_value,
             }
 
             output_msg += out(
                 "FIELD_UPDATED",
                 field=field_name,
-                new=get_field_str(field_name, template["fields"][field_name])
+                new=get_field_str(field_name, template["fields"][field_name]),
             )
 
         sheets_changed: int = 0
