@@ -3,11 +3,14 @@ from typing import Any
 
 from discord.ext import commands
 
-from botofspades.outmsg import out, botsend, send
-from botofspades.log import extension_loaded, extension_unloaded
-from botofspades.jsonwrappers import *
-from botofspades.extensions.charsheets.types import *
 from botofspades import unicode
+from botofspades.extensions.charsheets import types
+from botofspades.log import extension_loaded, extension_unloaded
+from botofspades.outmsg import out, botsend, send
+from botofspades.jsonwrappers import (
+    JSONFileWrapperReadOnly,
+    JSONFileWrapperUpdate
+)
 
 
 EXTENSION_NAME: str = "Charsheets"
@@ -17,12 +20,12 @@ templates_dir: Path = base_dir / "templates"
 charsheets_dir: Path = base_dir / "sheets"
 
 
-FIELD_TYPES: dict[str, type[Field]] = {
-    "abacus": Abacus,
-    "rational": Rational,
-    "lever": Lever,
-    "scroll": Scroll,
-    "gauge": Gauge,
+FIELD_TYPES: dict[str, type[types.Field]] = {
+    "abacus": types.Abacus,
+    "rational": types.Rational,
+    "lever": types.Lever,
+    "scroll": types.Scroll,
+    "gauge": types.Gauge,
 }
 
 
