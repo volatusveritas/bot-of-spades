@@ -17,9 +17,11 @@ class BotControl(commands.Cog):
         for ext in constants.DEFAULT_EXTENSIONS:
             await self.bot.reload_extension(f"botofspades.extensions.{ext}")
 
+        await self.bot.tree.sync(guild=constants.TARGET_GUILD)
+
         update_defbank()
 
-        await botsend(ctx, "Bot reloaded.")
+        await ctx.message.reply("Bot reloaded.")
 
 
 async def setup(bot: commands.Bot) -> None:

@@ -2,6 +2,8 @@ import re
 from pathlib import Path
 from dataclasses import dataclass
 
+from discord import Interaction
+
 
 DEF_INDENT_LEVEL: int = 4
 ESCAPE_SEQUENCES: dict[str, str] = {"\\n": "\n"}
@@ -22,12 +24,12 @@ class Emoji:
     ERROR: str = ":small_red_triangle_down:"
 
 
-async def send(ctx, defname: str, **replacements) -> None:
-    await botsend(ctx, out(defname, **replacements))
+async def send(itr: Interaction, defname: str, **replacements) -> None:
+    await botsend(itr, out(defname, **replacements))
 
 
-async def botsend(ctx, msg: str) -> None:
-    await ctx.message.reply(msg)
+async def botsend(itr: Interaction, msg: str) -> None:
+    await itr.response.send_message(msg)
 
 
 def out(defname: str, **replacements) -> str:

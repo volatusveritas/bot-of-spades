@@ -164,3 +164,6 @@ cython_debug/
 
 # Bot's token
 /.BOT_TOKEN
+
+# Target server ID for development mode
+/.SERVER_ID

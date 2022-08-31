@@ -15,6 +15,9 @@ from math import floor
 # Gauge > "x/y" | array[number("x"), number("y")] | list[int("x"), int("y")]
 
 
+Args = tuple[str, ...]
+
+
 class Field:
     @staticmethod
     def validate(value: Any) -> bool:
@@ -55,7 +58,7 @@ class Abacus(Field):
     # Possible command for this: cs sh do <sheet> <field> <method> <args>*
 
     @staticmethod
-    def method_add(value: int, args: tuple[str, ...]) -> int:
+    def method_add(value: int, args: Args) -> int:
         to_add: int
 
         try:
@@ -66,7 +69,7 @@ class Abacus(Field):
         return value + to_add
 
     @staticmethod
-    def method_subtract(value: int, args: tuple[str, ...]) -> int:
+    def method_subtract(value: int, args: Args) -> int:
         to_sub: int
 
         try:
@@ -77,7 +80,7 @@ class Abacus(Field):
         return value - to_sub
 
     @staticmethod
-    def method_multiply(value: int, args: tuple[str, ...]) -> int:
+    def method_multiply(value: int, args: Args) -> int:
         to_mul: int
 
         try:
@@ -88,7 +91,7 @@ class Abacus(Field):
         return value * to_mul
 
     @staticmethod
-    def method_divide(value: int, args: tuple[str, ...]) -> int:
+    def method_divide(value: int, args: Args) -> int:
         to_div: int
 
         try:
@@ -118,7 +121,7 @@ class Rational(Field):
         return str(value)
 
     @staticmethod
-    def method_add(value: float, args: tuple[str, ...]) -> float:
+    def method_add(value: float, args: Args) -> float:
         to_add: float
 
         try:
@@ -129,7 +132,7 @@ class Rational(Field):
         return value + to_add
 
     @staticmethod
-    def method_subtract(value: float, args: tuple[str, ...]) -> float:
+    def method_subtract(value: float, args: Args) -> float:
         to_sub: float
 
         try:
@@ -140,7 +143,7 @@ class Rational(Field):
         return value - to_sub
 
     @staticmethod
-    def method_multiply(value: float, args: tuple[str, ...]) -> float:
+    def method_multiply(value: float, args: Args) -> float:
         to_mul: float
 
         try:
@@ -151,7 +154,7 @@ class Rational(Field):
         return value * to_mul
 
     @staticmethod
-    def method_divide(value: float, args: tuple[str, ...]) -> float:
+    def method_divide(value: float, args: Args) -> float:
         to_div: float
 
         try:
@@ -162,7 +165,7 @@ class Rational(Field):
         return value / to_div
 
     @staticmethod
-    def method_round(value: float, args: tuple[str, ...]) -> float:
+    def method_round(value: float, args: Args) -> float:
         # HACK: Manual float correction so a value of exactly 0.5 rounds down.
         return floor(value + 0.5 - 1e-16)
 
@@ -195,6 +198,10 @@ class Lever(Field):
     def to_str(value: bool) -> str:
         return "on" if value else "off"
 
+    @staticmethod
+    def method_toggle(value: bool, args: Args) -> bool:
+        return not value
+
 
 class Scroll(Field):
     @staticmethod
@@ -226,7 +233,12 @@ class Gauge(Field):
                 and isinstance(value[1], int)
             )
 
-        return False
+        try:
+            Gauge.from_str(value)
+        except:
+            return False
+
+        return True
 
     @staticmethod
     def from_str(value_str: str) -> list[int]:
@@ -235,3 +247,47 @@ class Gauge(Field):
     @staticmethod
     def to_str(value: list[int] | tuple[int, int]) -> str:
         return f"{value[0]}/{value[1]}"
+
+    @staticmethod
+    def method_add(value: list[int], args: Args) -> list[int]:
+        to_add: int
+
+        try:
+            to_add = int(args[0])
+        except:
+            raise TypeError
+
+        return [value[0] + to_add, value[1]]
+
+    @staticmethod
+    def method_subtract(value: list[int], args: Args) -> list[int]:
+        to_sub: int
+
+        try:
+            to_sub = int(args[0])
+        except:
+            raise TypeError
+
+        return [value[0] - to_sub, value[1]]
+
+    @staticmethod
+    def method_increase(value: list[int], args: Args) -> list[int]:
+        to_add: int
+
+        try:
+            to_add = int(args[0])
+        except:
+            raise TypeError
+
+        return [value[0], value[1] + to_add]
+
+    @staticmethod
+    def method_decrease(value: list[int], args: Args) -> list[int]:
+        to_sub: int
+
+        try:
+            to_sub = int(args[0])
+        except:
+            raise TypeError
+
+        return [value[0], value[1] - to_sub]
