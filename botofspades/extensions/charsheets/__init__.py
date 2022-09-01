@@ -118,7 +118,7 @@ async def _update_field(
 class Charsheets(apc.Group): ...
 
 class Template(apc.Group):
-    @apc.command()
+    @apc.command(description="Creates a template.")
     async def add(self, itr: Interaction, name: str) -> None:
         name = name.lower()
 
@@ -134,7 +134,7 @@ class Template(apc.Group):
         except FileExistsError:
             await send(itr, "TEMPLATE_ALREADY_EXISTS", name=name.title())
 
-    @apc.command()
+    @apc.command(description="Deletes a template.")
     async def remove(self, itr: Interaction, names: str) -> None:
         output_msg: str = ""
 
@@ -165,7 +165,7 @@ class Template(apc.Group):
 
         await botsend(itr, output_msg)
 
-    @apc.command()
+    @apc.command(description="Renames a template.")
     async def rename(
         self,
         itr: Interaction,
@@ -205,7 +205,7 @@ class Template(apc.Group):
 
         await botsend(itr, output_msg)
 
-    @apc.command()
+    @apc.command(description="Lists available templates.")
     async def list(self, itr: Interaction) -> None:
         template_names: list[str] = [
             template_path.stem.title()
@@ -228,7 +228,7 @@ class Template(apc.Group):
             else out("NO_TEMPLATES_AVAILABLE"),
         )
 
-    @apc.command()
+    @apc.command(description="Adds a template field.")
     async def field_add(
         self,
         itr: Interaction,
@@ -301,7 +301,7 @@ class Template(apc.Group):
 
         await botsend(itr, output_msg)
 
-    @apc.command()
+    @apc.command(description="Removes a template field.")
     async def field_remove(
         self,
         itr: Interaction,
@@ -360,7 +360,7 @@ class Template(apc.Group):
 
         await botsend(itr, output_msg)
 
-    @apc.command()
+    @apc.command(description="Renames a template field.")
     async def field_rename(
         self,
         itr: Interaction,
@@ -420,7 +420,7 @@ class Template(apc.Group):
 
         await botsend(itr, output_msg)
 
-    @apc.command()
+    @apc.command(description="Lists the fields in a template.")
     async def field_list(
         self,
         itr: Interaction,
@@ -470,7 +470,7 @@ class Template(apc.Group):
             else out("NO_FIELDS", template=template_name),
         )
 
-    @apc.command()
+    @apc.command(description="Modifies a template field's signature.")
     async def field_edit(
         self,
         itr: Interaction,
@@ -545,7 +545,7 @@ class Template(apc.Group):
         await botsend(itr, output_msg)
 
 class Sheet(apc.Group):
-    @apc.command()
+    @apc.command(description="Creates a sheet from a template.")
     async def add(
         self,
         itr: Interaction,
@@ -583,7 +583,7 @@ class Sheet(apc.Group):
         except FileExistsError:
             await send(itr, "SHEET_ALREADY_EXISTS", name=sheet_name.title())
 
-    @apc.command()
+    @apc.command(description="Deletes a sheet.")
     async def remove(self, itr: Interaction, names: str) -> None:
         output_msg: str = ""
         for name in [name.lower() for name in get_str_varargs(names)]:
@@ -597,7 +597,7 @@ class Sheet(apc.Group):
 
         await botsend(itr, output_msg)
 
-    @apc.command()
+    @apc.command(description="Renames a sheet.")
     async def rename(
         self,
         itr: Interaction,
@@ -627,7 +627,11 @@ class Sheet(apc.Group):
             new=new_name.title()
         )
 
-    @apc.command()
+    @apc.command(
+        description=(
+            "Lists available sheets (optionally filtering by template)."
+        )
+    )
     async def list(self, itr: Interaction, template: str = "") -> None:
         template = template.lower()
 
@@ -655,7 +659,7 @@ class Sheet(apc.Group):
             else out("NO_SHEETS_AVAILABLE")
         )
 
-    @apc.command()
+    @apc.command(description="Converts a sheet to text.")
     async def totext(self, itr: Interaction, name: str) -> None:
         name = name.lower()
 
@@ -687,7 +691,7 @@ class Sheet(apc.Group):
 
         await botsend(itr, output_msg)
 
-    @apc.command()
+    @apc.command(description="Inspects a sheet field or changes its value.")
     async def field(
         self,
         itr: Interaction,
@@ -738,7 +742,7 @@ class Sheet(apc.Group):
                 ),
             )
 
-    @apc.command()
+    @apc.command(description="Performs a method on a sheet field.")
     async def do(
         self,
         itr,
