@@ -299,3 +299,7 @@ class Gauge(Field):
             raise TypeError
 
         return [value[0], value[1] - to_sub]
+
+    @staticmethod
+    def method_reset(value: list[int], args: Args) -> list[int]:
+        return [value[1], value[1]]
