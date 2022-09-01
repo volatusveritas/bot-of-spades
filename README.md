@@ -1,12 +1,39 @@
 <img src="img/bot-of-spades-github-banner.png" align="center" />
 
-<!-- 1. What is it? -->
+<!-- TODO: What is it? -->
 
-<!-- 2. How do I use it? -->
+## Install and Setup
 
-<!-- 2.1. How do I install it? -->
+First, download or clone this repository's contents.
 
-<!-- 2.2. How do I run it? -->
+Then, create a file called `.BOT_TOKEN` in the root directory of the repository
+and inside of it place you bot's token (and nothing else).
+
+The last step is optional. Currently, registering a global slash command (one
+that can be used by any server the bot is in) takes a long time, so from the
+moment you first run your bot, it'll take a while for the commands to be
+available. A better option if you're running this bot in a local, small server
+or if you're performing development is to specify a server (formally called a
+"guild") to which the bot is going to register the commands to (they are
+registered instantly). To do so, in the root directory of the repository,
+create a file called `.SERVER_ID` and place inside of it the target server's ID
+(and nothing else).
+
+## Running the Bot
+
+After you've [installed and setup](#install-and-setup) the bot, the recommended
+way to run it is by going to the root directory of the repository and
+executing:
+
+```shell
+python -m botofspades
+```
+
+Or, if you don't want it to cache binaries (`.pyc` files), use:
+
+```shell
+python -B -m botofspades
+```
 
 ## Modules
 
@@ -55,53 +82,54 @@ character sheets and character sheet templates.
 
 | Command | Description |
 | ------- | ----------- |
-| `charsheets template add <name>` | Creates a new template called `name`. |
-| `charsheets template list` | Lists the templates available. |
-| `charsheets template rename <old_name> <new_name>` | Renames a template from `old_name` to `new_name`. |
-| `charsheets template remove <name>*` | Removes each template `name`. |
-| `charsheets template field add <template_name> <field_name> <type> [default]` | Creates a new field in template `template_name` called `field_name` with type `type` and default value `default` if provided. |
-| `charsheets template field edit <template_name> <field_name> <type> [default]` | Modifies a field in template `template_name` called `field_name` to have type `type` and default value `default` if provided. |
-| `charsheets template field list <template_name> [type]` | Lists the fields in template `template_name`. If `type` is provided, only shows fields with type `type`. |
-| `charsheets template field remove <template_name> <field_name>*` | Deletes each field `field_name` from template `template_name`. |
-| `charsheets template field rename <template_name> <old_name> <new_name>` | Renames a field in template `template_name` from `old_name` to `new_name`. |
-| `charsheets sheet add <sheet_name> <template_name>` | Rreates a new sheet from template `template_name` called `sheet_name`. |
-| `charsheets sheet field <sheet_name> <field_name> [value]` | Rnspects the value of field `field_name` from sheet `sheet_name`. If `value` is provided, sets the value of the field to that. |
-| `charsheets sheet list [template]` | Lists sheets. If `template` is provided, only shows sheets created from template `template`. |
-| `charsheets sheet remove <name>*` | Removes each sheet `name`. |
-| `charsheets sheet rename <old_name> <new_name>` | Renames a sheet from `old_name` to `new_name`. |
-| `charsheets sheet totext <name>` | Provides a formatted textual version of sheet `name`. |
+| `/charsheets template add <name>` | Creates a new template called `name`. |
+| `/charsheets template list` | Lists the templates available. |
+| `/charsheets template rename <old_name> <new_name>` | Renames a template from `old_name` to `new_name`. |
+| `/charsheets template remove <name>*` | Removes each template `name`. |
+| `/charsheets template field_add <template_name> <field_name> <type> [default]` | Creates a new field in template `template_name` called `field_name` with type `type` and default value `default` if provided. |
+| `/charsheets template field_edit <template_name> <field_name> <type> [default]` | Modifies a field in template `template_name` called `field_name` to have type `type` and default value `default` if provided. |
+| `/charsheets template field_list <template_name> [type]` | Lists the fields in template `template_name`. If `type` is provided, only shows fields with type `type`. |
+| `/charsheets template field_remove <template_name> <field_name>*` | Deletes each field `field_name` from template `template_name`. |
+| `/charsheets template field_rename <template_name> <old_name> <new_name>` | Renames a field in template `template_name` from `old_name` to `new_name`. |
+| `/charsheets sheet add <sheet_name> <template_name>` | Rreates a new sheet from template `template_name` called `sheet_name`. |
+| `/charsheets sheet field <sheet_name> <field_name> [value]` | Rnspects the value of field `field_name` from sheet `sheet_name`. If `value` is provided, sets the value of the field to that. |
+| `/charsheets sheet list [template]` | Lists sheets. If `template` is provided, only shows sheets created from template `template`. |
+| `/charsheets sheet remove <name>*` | Removes each sheet `name`. |
+| `/charsheets sheet rename <old_name> <new_name>` | Renames a sheet from `old_name` to `new_name`. |
+| `/charsheets sheet totext <name>` | Provides a formatted textual version of sheet `name`. |
+| `/charsheets sheet do <sheet_name> <field_name> <method_name> <args>` | Executes `method_name` on the field `field_name` from sheet `sheet_name` with the comma separated list of args `args`. |
 
 #### Examples
 
 Creates a template called `bananakorn`:
 ```
-charsheets template add bananakorn
+/charsheets template add bananakorn
 ```
 
 Creates a field called `peels` in template `bananakorn` of type `Abacus` and a
 default value of `7`.
 ```
-charsheets template field add bananakorn peels Abacus 7
+/charsheets template field add bananakorn peels Abacus 7
 ```
 
 Creates a character sheet called `Carlsen` from template `bananakorn`.
 ```
-charsheets sheet add Carlsen bananakorn
+/charsheets sheet add Carlsen bananakorn
 ```
 
 Inspects the value of `peels` in sheet `Carlsen`.
 ```
-charsheets sheet field Carlsen peels
+/charsheets sheet field Carlsen peels
 ```
 
 Sets the value of `peels` in sheet `Carlsen` to 12.
 ```
-charsheets sheet field Carlsen peels 12
+/charsheets sheet field Carlsen peels 12
 ```
 
 Provides a formatted textual version of sheet `Carlsen`.
 ```
-charsheets sheet totext Carlsen
+/charsheets sheet totext Carlsen
 ```
 
 ## Command Idiom
