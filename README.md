@@ -97,7 +97,7 @@ character sheets and character sheet templates.
 | `/charsheets sheet remove <name>*` | Removes each sheet `name`. |
 | `/charsheets sheet rename <old_name> <new_name>` | Renames a sheet from `old_name` to `new_name`. |
 | `/charsheets sheet totext <name>` | Provides a formatted textual version of sheet `name`. |
-| `/charsheets sheet do <sheet_name> <field_name> <method_name> <args>` | Executes `method_name` on the field `field_name` from sheet `sheet_name` with the comma separated list of args `args`. |
+| `/charsheets sheet do <sheet_name> <field_name> <method_name> [args]` | Executes `method_name` on the field `field_name` from sheet `sheet_name` with the comma separated list of args `args`. |
 
 #### Examples
 

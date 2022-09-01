@@ -740,7 +740,7 @@ class Sheet(apc.Group):
         sheet_name: str,
         field_name: str,
         method_name: str,
-        args: str,
+        args: str = "",
     ):
         sheet_name = sheet_name.lower()
         field_name = field_name.lower()
