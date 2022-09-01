@@ -48,7 +48,7 @@ SHEETS_UPDATED
     {Emoji.INFO} Sheets updated: {amount}.
 
 FIELD_VALUE_SET
-    {Emoji.SUCCESS} Value of **{field}** set to {value}.
+    {Emoji.SUCCESS} Value of **{field}** set to **{value}**.
 
 FIELD_ALREADY_EXISTS
     {Emoji.ERROR} Field **{name}** already exists.
@@ -63,9 +63,6 @@ FIELD_REMOVED
 
 FIELD_RENAMED
     {Emoji.SUCCESS} Field **{field}** successfully renamed to **{new}**.
-
-FIELD_UPDATED
-    {Emoji.SUCCESS} Field **{field}** successfully updated to **{new}**.
 
 FIELD_NOT_FOUND
     {Emoji.ERROR} Field **{name}** not found.
@@ -99,9 +96,6 @@ NO_TEMPLATES_AVAILABLE
 
 NO_SHEETS_AVAILABLE
     {Emoji.ERROR} No sheets available.
-
-INVALID_FIELD_TEMPLATE
-    {Emoji.ERROR} Invalid template **{template}** for field **{field}**.
 
 FIELD_VALUE
     {Emoji.INFO} Field value: **{field_str}**.

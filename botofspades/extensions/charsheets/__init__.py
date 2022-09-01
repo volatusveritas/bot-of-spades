@@ -61,12 +61,16 @@ def get_template_field_str(
 ) -> str:
     return (
         f"{template.title()} :: {field.title()} ({type_name.title()})"
-        + (f" [Default is {default}]" if default is not None else "")
+        + (f" [Default is {default}]" if default else "")
     )
 
 
-def get_sheet_field_str(sheet: str, field: str, value: Any) -> str:
-    return f"{sheet.title()} :: {field.title()} = {value}"
+def get_sheet_field_sig_str(sheet: str, field: str) -> str:
+    return f"{sheet.title()} :: {field.title()}"
+
+
+def get_sheet_field_str(sheet: str, field: str, value: str) -> str:
+    return f"{get_sheet_field_sig_str(sheet, field)} = {value}"
 
 
 def get_sheet_str(name: str, template: str) -> str:
@@ -93,18 +97,15 @@ async def _update_field(
             type_name: str = template["fields"][field_name]["type"]
 
             try:
+                old_value: Any = sheet["fields"][field_name]
                 new_value: Any = FIELD_TYPES[type_name].from_str(value)
                 sheet["fields"][field_name] = new_value
 
                 await send(
                     itr,
                     "FIELD_VALUE_SET",
-                    field=get_sheet_field_str(
-                        sheet_name,
-                        field_name,
-                        template["fields"][field_name],
-                    ),
-                    value=sheet["fields"][field_name],
+                    field=get_sheet_field_sig_str(sheet_name, field_name),
+                    value=FIELD_TYPES[type_name].to_str(new_value),
                 )
             except:
                 await send(
@@ -285,6 +286,7 @@ class Template(apc.Group):
                     field_name,
                     type_name,
                     FIELD_TYPES[type_name].to_str(default_value)
+                    if default_value else ""
                 ),
                 template=template_name.title(),
             )
@@ -340,8 +342,9 @@ class Template(apc.Group):
                         FIELD_TYPES[
                             template["fields"][field_name]["type"]
                         ].to_str(template["fields"][field_name]["default"])
+                        if template["fields"][field_name]["default"] else ""
                     ),
-                    template=template_name,
+                    template=template_name.title(),
                 )
 
                 del template["fields"][field_name]
@@ -454,6 +457,7 @@ class Template(apc.Group):
                         name,
                         value["type"],
                         FIELD_TYPES[value["type"]].to_str(value["default"])
+                        if value["default"] else ""
                     )
                 )
 
@@ -521,7 +525,7 @@ class Template(apc.Group):
 
             output_msg += out(
                 "FIELD_UPDATED",
-                field=field_name,
+                old=field_name.title(),
                 new=get_template_field_str(
                     template_name,
                     field_name,
@@ -717,19 +721,6 @@ class Sheet(apc.Group):
         with JSONFileWrapperReadOnly(sheet_path) as sheet:
             if field_name not in sheet["fields"]:
                 await send(itr, "FIELD_NOT_FOUND", name=field_name.title())
-                return
-
-            template_path: Path = get_template_path(sheet["template"])
-
-            if not template_path.exists():
-                await send(
-                    itr,
-                    "INVALID_FIELD_TEMPLATE",
-                    template=sheet["template"],
-                    field=get_sheet_field_str(
-                        sheet_name, field_name, sheet["fields"][field_name]
-                    ),
-                )
                 return
 
             await send(
