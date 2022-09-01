@@ -1,5 +1,5 @@
 from typing import Any
-from math import floor
+from math import ceil, floor
 
 
 # Any value coming from Discord is a string.
@@ -163,6 +163,14 @@ class Rational(Field):
             raise TypeError
 
         return value / to_div
+
+    @staticmethod
+    def method_roundup(value: float, args: Args) -> float:
+        return ceil(value)
+
+    @staticmethod
+    def method_rounddown(value: float, args: Args) -> float:
+        return floor(value)
 
     @staticmethod
     def method_round(value: float, args: Args) -> float:
