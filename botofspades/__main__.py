@@ -8,8 +8,11 @@ from botofspades.outmsg import update_defbank
 from botofspades.bot import bot
 
 
-with open(".SERVER_ID") as id_file:
-    constants.TARGET_GUILD = Object(int(id_file.read()))
+try:
+    with open(".SERVER_ID") as id_file:
+        constants.TARGET_GUILD = Object(int(id_file.read()))
+except OSError:
+    constants.TARGET_GUILD = None
 
 update_defbank()
 setup_logging()
