@@ -106,5 +106,8 @@ METHOD_NOT_FOUND
 NULL_FIELD
     {Emoji.ERROR} Can't operate on the null field **{name}**.
 
-FIELD_UPDATED
-    {Emoji.SUCCESS} Field **{old}** updated to **{new}**.
+TEMPLATE_FIELD_UPDATED
+    {Emoji.SUCCESS} Field **{field}** updated to **{new}**.
+
+SHEET_FIELD_UPDATED
+    {Emoji.SUCCESS} Field **{field}** updated from **{old}** to **{new}**.

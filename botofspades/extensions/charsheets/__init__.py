@@ -524,8 +524,8 @@ class Template(apc.Group):
             }
 
             output_msg += out(
-                "FIELD_UPDATED",
-                old=field_name.title(),
+                "TEMPLATE_FIELD_UPDATED",
+                field=field_name.title(),
                 new=get_template_field_str(
                     template_name,
                     field_name,
@@ -789,14 +789,14 @@ class Sheet(apc.Group):
 
                 await send(
                     itr,
-                    "FIELD_UPDATED",
-                    old=get_sheet_field_str(
+                    "SHEET_FIELD_UPDATED",
+                    field=get_sheet_field_sig_str(
                         sheet_name,
                         field_name,
-                        FIELD_TYPES[
-                            template["fields"][field_name]["type"]
-                        ].to_str(old_value)
                     ),
+                    old=FIELD_TYPES[
+                        template["fields"][field_name]["type"]
+                    ].to_str(old_value),
                     new=FIELD_TYPES[
                         template["fields"][field_name]["type"]
                     ].to_str(sheet["fields"][field_name])
