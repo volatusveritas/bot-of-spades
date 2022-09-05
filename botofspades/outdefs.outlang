@@ -80,7 +80,7 @@ INVALID_FIELD_VALUE
     {Emoji.ERROR} Invalid value '{value}' for type {type}.
 
 INVALID_FIELD_TYPE
-    {Emoji.ERROR} Invalid type **{type}**.
+    {Emoji.ERROR} Invalid type **{name}**.
 
 MISSING_ARGUMENT
     {Emoji.ERROR} Missing argument `{param}`. Usage: `{usage}`.
