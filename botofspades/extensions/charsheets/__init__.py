@@ -97,7 +97,6 @@ async def _update_field(
             type_name: str = template["fields"][field_name]["type"]
 
             try:
-                old_value: Any = sheet["fields"][field_name]
                 new_value: Any = FIELD_TYPES[type_name].from_str(value)
                 sheet["fields"][field_name] = new_value
 
@@ -736,7 +735,7 @@ class Sheet(apc.Group):
     @apc.command(description="Performs a method on a sheet field.")
     async def do(
         self,
-        itr,
+        itr: Interaction,
         sheet_name: str,
         field_name: str,
         method_name: str,
@@ -801,6 +800,31 @@ class Sheet(apc.Group):
                         template["fields"][field_name]["type"]
                     ].to_str(sheet["fields"][field_name])
                 )
+
+    @apc.command(description="Shows the sheet's fields in an embed.")
+    async def get(self, itr: Interaction, sheet_name: str):
+        sheet_name = sheet_name.lower()
+
+        sheet_path: Path = get_sheet_path(sheet_name)
+
+        if not sheet_path.exists():
+            await send(itr, "FIELD_NOT_FOUND", name=sheet_name.title())
+
+        output_msg: str = f"**{sheet_name.upper()}**\n\n"
+        with JSONFileWrapperReadOnly(sheet_path) as sheet:
+            with JSONFileWrapperReadOnly(
+                get_template_path(sheet["template"])
+            ) as template:
+                for name, value in sheet["fields"].items():
+                    output_msg += (
+                        f"**{name.title()}**:  "
+                        + FIELD_TYPES[
+                            template["fields"][name]["type"]
+                        ].to_str(value)
+                        + "\n"
+                    )
+
+        await botsend(itr, output_msg)
 
 
 async def setup(bot: commands.Bot) -> None:
