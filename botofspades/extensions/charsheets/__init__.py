@@ -805,8 +805,8 @@ class Sheet(apc.Group):
 
 async def setup(bot: commands.Bot) -> None:
     charsheets = Charsheets()
-    template = Template(parent=charsheets)
-    sheet = Sheet(parent=charsheets)
+    charsheets.add_command(Template())
+    charsheets.add_command(Sheet())
 
     add_slash_command(bot, charsheets)
     extension_loaded(EXTENSION_NAME)
