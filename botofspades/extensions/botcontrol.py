@@ -1,34 +1,34 @@
+from discord import Interaction
 from discord.ext import commands
+from discord import app_commands as apc
 
 from botofspades import constants
+from botofspades.bot import bot
 from botofspades.log import extension_loaded, extension_unloaded
 from botofspades.outmsg import botsend, update_defbank
+from botofspades.slash import add_slash_command, remove_slash_command
 
 
 EXTENSION_NAME: str = "Bot Control"
 
 
-class BotControl(commands.Cog):
-    def __init__(self, bot: commands.Bot) -> None:
-        self.bot: commands.Bot = bot
+@apc.command()
+async def reload(itr: Interaction) -> None:
+    for ext in constants.DEFAULT_EXTENSIONS:
+        await bot.reload_extension(f"botofspades.extensions.{ext}")
 
-    @commands.command()
-    async def reload(self, ctx) -> None:
-        for ext in constants.DEFAULT_EXTENSIONS:
-            await self.bot.reload_extension(f"botofspades.extensions.{ext}")
+    await bot.tree.sync(guild=constants.TARGET_GUILD)
 
-        await self.bot.tree.sync(guild=constants.TARGET_GUILD)
+    update_defbank()
 
-        update_defbank()
-
-        await ctx.message.reply("Bot reloaded.")
+    await botsend(itr, "Bot reloaded.")
 
 
 async def setup(bot: commands.Bot) -> None:
-    await bot.add_cog(BotControl(bot))
+    add_slash_command(bot, reload)
     extension_loaded(EXTENSION_NAME)
 
 
 async def teardown(bot: commands.Bot) -> None:
-    await bot.remove_cog("BotControl")
+    remove_slash_command(bot, "reload")
     extension_unloaded(EXTENSION_NAME)
