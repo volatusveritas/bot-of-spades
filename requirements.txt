@@ -2,3 +2,4 @@ discord.py>=2.0.1
 voladice>=0.2.0
 cchardet>=2.1.7
 aiodns>=3.0.0
+Sphinx>=5.1.1
