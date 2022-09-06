@@ -22,6 +22,7 @@ class Emoji:
     SUCCESS: str = ":star2:"
     INFO: str = ":bell:"
     ERROR: str = ":small_red_triangle_down:"
+    CS_CHARACTER: str = ":busts_in_silhouette:"
 
 
 async def send(itr: Interaction, defname: str, **replacements) -> None:

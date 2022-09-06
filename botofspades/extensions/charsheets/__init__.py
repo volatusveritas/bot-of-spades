@@ -9,7 +9,7 @@ from utils import get_str_varargs
 from botofspades import unicode
 from botofspades.extensions.charsheets import types
 from botofspades.log import extension_loaded, extension_unloaded
-from botofspades.outmsg import out, botsend, send
+from botofspades.outmsg import out, botsend, send, Emoji
 from botofspades.jsonwrappers import (
     JSONFileWrapperReadOnly,
     JSONFileWrapperUpdate
@@ -810,14 +810,14 @@ class Sheet(apc.Group):
         if not sheet_path.exists():
             await send(itr, "FIELD_NOT_FOUND", name=sheet_name.title())
 
-        output_msg: str = f"**{sheet_name.upper()}**\n\n"
+        output_msg: str = f"{Emoji.CS_CHARACTER} *{sheet_name.title()}*\n\n"
         with JSONFileWrapperReadOnly(sheet_path) as sheet:
             with JSONFileWrapperReadOnly(
                 get_template_path(sheet["template"])
             ) as template:
                 for name, value in sheet["fields"].items():
                     output_msg += (
-                        f"**{name.title()}**:  "
+                        f"**{name.title()}** :  "
                         + FIELD_TYPES[
                             template["fields"][name]["type"]
                         ].to_str(value)
