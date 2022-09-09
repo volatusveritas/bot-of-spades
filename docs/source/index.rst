@@ -1,14 +1,26 @@
-.. Bot of Spades documentation master file, created by
-   sphinx-quickstart on Tue Sep  6 04:00:54 2022.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Welcome to Bot of Spades's documentation!
 =========================================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :hidden:
+   :maxdepth: 1
+   :caption: General
+   :name: sec-general
+
+   getting_started
+   modules/index
+
+
+A bot for all things TTRPG! Bot of Spades can manage character sheets,
+templates, initiative, attribute modifiers, creature and item catalogues,
+inventories, currency exchange, dictionaries, and much more!
+
+If you've just found this and have no idea of where to go first, head to
+:doc:`getting_started`.
+
+Bot of Spades' functionality is divided into **modules**. To get the most out
+of the bot, read more about each module in the :ref:`sec-modules` section of
+the navigation bar.
 
 
 
