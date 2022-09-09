@@ -1,0 +1,17 @@
+[project]
+name = "bot-of-spades"
+version = "0.1.0"
+description = "A Discord bot for all things TTRPG"
+readme = "README.md"
+requires-python = ">=3.10.6"
+authors = ["volatusveritas"]
+dependencies = [
+    "discord.py>=2.0.1",
+    "voladice>=0.2.0",
+    "cchardet>=2.1.7",
+    "aiodns>=3.0.0",
+    "Sphinx>=5.1.1",
+]
+
+[project.license]
+file = "LICENSE"
