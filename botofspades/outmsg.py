@@ -9,7 +9,7 @@ DEF_INDENT_LEVEL: int = 4
 ESCAPE_SEQUENCES: dict[str, str] = {"\\n": "\n"}
 
 
-outdefs_path: Path = Path.cwd() / "botofspades/outdefs.outlang"
+outdefs_path: Path = Path.cwd() / "botofspades/outdefs.outdefs"
 defbank: dict[str, str] = {}
 
 defend_re = re.compile(r"^\n")
